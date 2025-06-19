@@ -407,24 +407,3 @@ configs_keyboard(){
 
 }
 
-
-
-install_fonts() {
-    local font_dir="$HOME/.local/share/fonts"
-    local tmp_dir="$(mktemp -d)"
-
-    mkdir -p "$font_dir"
-
-    # Instalar JetBrainsMono Nerd Font
-    local jb_url="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip"
-    curl -fsSL "$jb_url" -o "$tmp_dir/JetBrainsMono.zip"
-    unzip -q "$tmp_dir/JetBrainsMono.zip" -d "$font_dir"
-
-    # Instalar Hack Nerd Font
-    local hack_url="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Hack.zip"
-    curl -fsSL "$hack_url" -o "$tmp_dir/Hack.zip"
-    unzip -q "$tmp_dir/Hack.zip" -d "$font_dir"
-
-    fc-cache -f "$font_dir"
-    rm -rf "$tmp_dir"
-}

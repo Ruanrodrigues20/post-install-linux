@@ -29,8 +29,35 @@ install_packages() {
         install $(python3 scripts/list_packages.py "common")
         install $(python3 scripts/list_packages.py "$DISTRO")
         if is_gnome; then
-            install $(python3 scripts/list_packages.py "gnome_debian")
+            install $(python3 scripts/list_packages.py "gnome_${DISTRO}")
         fi
+    else
+        echo "Invalid Distro: $DISTRO"
+        return 1
+    fi
+}
+
+install_fonts() {
+    echo -e "\e[1;34m===== 🔥 Installing Fonts =====\e[0m"
+    if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "arch" ]; then
+        install $(python3 scripts/list_packages.py "fonts_${DISTRO}")
+        local font_dir="$HOME/.local/share/fonts"
+        local tmp_dir="$(mktemp -d)"
+
+        mkdir -p "$font_dir"
+
+        # Instalar JetBrainsMono Nerd Font
+        local jb_url="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip"
+        curl -fsSL "$jb_url" -o "$tmp_dir/JetBrainsMono.zip"
+        unzip -q "$tmp_dir/JetBrainsMono.zip" -d "$font_dir"
+
+        # Instalar Hack Nerd Font
+        local hack_url="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Hack.zip"
+        curl -fsSL "$hack_url" -o "$tmp_dir/Hack.zip"
+        unzip -q "$tmp_dir/Hack.zip" -d "$font_dir"
+
+        fc-cache -f "$font_dir"
+        rm -rf "$tmp_dir"
     else
         echo "Invalid Distro: $DISTRO"
         return 1
@@ -64,7 +91,7 @@ install_flatpaks(){
     echo ""
 
     flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-
+    local apps=()
     # Transforma a string em array
     read -ra apps <<< "$(python3 scripts/list_packages.py "flatpaks")"
 
@@ -92,8 +119,12 @@ downloads_debs() {
             done
 
             local programs=(./*.deb)
-            install "${programs[@]}"
+            
+            for p in "${programs[@]}"; do
+                sudo dpkg -i $p
+            done
             rm ./*.deb
+
         )
 
         corrigir_vscode_sources

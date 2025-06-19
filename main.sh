@@ -43,6 +43,7 @@ main() {
     setup_yay
     check_dependencies
     install_packages
+    install_fonts
     install_firefox_deb
     downloads_debs
     intellij_install
@@ -73,4 +74,3 @@ main() {
 # Execução
 # ======================
 main
-

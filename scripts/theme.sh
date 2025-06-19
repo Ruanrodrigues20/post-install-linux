@@ -23,12 +23,9 @@ gtk_theme() {
 }
 
 clone_repositories() {
-    local reps=(
-        "https://github.com/vinceliuice/WhiteSur-gtk-theme.git"
-        "https://github.com/vinceliuice/WhiteSur-icon-theme.git"
-        "https://github.com/vinceliuice/WhiteSur-wallpapers.git"
-        "https://github.com/vinceliuice/WhiteSur-cursors.git"
-    )
+    
+    local reps=()
+    read -ra reps <<< "$(python3 scripts/list_packages.py "themes")"
 
     for rep in "${reps[@]}"; do
         local folder=$(basename "$rep" .git)
@@ -36,7 +33,7 @@ clone_repositories() {
             echo "📁 Repository '$folder' already cloned. Skipping."
         else
             echo "⬇️ Cloning '$rep'..."
-            git clone "$rep"
+            git clone $rep
         fi
     done
 }

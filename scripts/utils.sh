@@ -1,7 +1,5 @@
 #!/bin/bash
 
-
-
 # Welcome message
 show_intro_message(){
     echo -e "\e[1;34m🎉 Welcome! Starting the Arch Linux/Debian post-installation setup... 🚀\e[0m"
