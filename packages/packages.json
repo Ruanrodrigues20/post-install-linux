@@ -1,0 +1,78 @@
+{
+  "arch": [
+    "jdk21-openjdk",
+    "python-pip",
+    "visual-studio-code-bin",
+    "libreoffice-fresh-pt-br",
+    "ttf-ms-fonts",
+    "ttf-jetbrains-mono-nerd",
+    "intellij-idea-ultimate-edition",
+    "firefox"
+  ],
+  "common": [
+    "vlc",
+    "fastfetch",
+    "transmission",
+    "obs-studio",
+    "maven",
+    "flatpak"
+  ],
+  "debian": [
+    "snapd",
+    "python3-pip",
+    "python3-venv",
+    "python3-poetry",
+    "openjdk-21-jdk",
+    "fonts-powerline"
+  ],
+  "dependencies": [
+    "bash-completion",
+    "imagemagick",
+    "git",
+    "wget",
+    "curl",
+    "vim",
+    "tree",
+    "unzip",
+    "zip",
+    "tar"
+  ],
+  "downloads_debs": [
+    "https://github.com/fastfetch-cli/fastfetch/releases/download/2.42.0/fastfetch-linux-amd64.deb",
+    "http://ftp.de.debian.org/debian/pool/contrib/m/msttcorefonts/ttf-mscorefonts-installer_3.8.1_all.deb",
+    "https://vscode.download.prss.microsoft.com/dbazure/download/stable/848b80aeb52026648a8ff9f7c45a9b0a80641e2e/code_1.100.2-1747260578_amd64.deb"
+  ],
+  "flatpaks": [
+    "com.discordapp.Discord",
+    "org.gnome.DejaDup",
+    "io.github.realmazharhussain.GdmSettings",
+    "com.getpostman.Postman",
+    "io.missioncenter.MissionCenter"
+  ],
+  "gnome_arch": [
+    "gnome-tweaks",
+    "gnome-shell-extension-alphabetical-grid-extension",
+    "gnome-shell-extension-appindicator",
+    "gnome-shell-extension-blur-my-shell",
+    "gnome-shell-extension-compiz-alike-magic-lamp-effect-git",
+    "gnome-shell-extension-compiz-windows-effect-git",
+    "gnome-shell-extension-dash-to-dock",
+    "gnome-shell-extension-desktop-cube-git"
+  ],
+  "gnome_debian": [
+    "gnome-tweaks",
+    "gnome-shell-extension-manager",
+    "gnome-software-plugin-flatpak",
+    "gnome-shell-extension-manager",
+    "gnome-shell-extension-appindicator",
+    "gnome-shell-extension-dashtodock",
+    "gnome-shell-extension-blur-my-shell",
+    "gnome-shell-extension-caffeine",
+    "gnome-shell-extension-user-theme"
+  ],
+  "snaps": [
+    "notion-snap-reborn",
+    "notion-calendar-snap",
+    "snap-store"
+  ]
+}
