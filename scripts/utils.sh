@@ -64,6 +64,12 @@ show_logo(){
 
 
 ask_to_restart(){
+    if [ $DISTRO == "arch" ]; then
+        yay -Sy --aur --devel --timeupdate
+        rm -rf ~/.cache/yay/completion.cache
+        yay -Syu
+    fi
+
     read -p "Do you want to restart your system now? (y/n): " ans
     if [[ "$ans" == "y" || "$ans" == "Y" ]]; then
         sudo reboot

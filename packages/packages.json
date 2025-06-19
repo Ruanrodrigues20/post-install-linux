@@ -7,7 +7,8 @@
     "ttf-ms-fonts",
     "ttf-jetbrains-mono-nerd",
     "intellij-idea-ultimate-edition",
-    "firefox"
+    "firefox",
+    "docker"
   ],
   "common": [
     "vlc",
@@ -15,7 +16,9 @@
     "transmission",
     "obs-studio",
     "maven",
-    "flatpak"
+    "flatpak",
+    "ufw",
+    "gufw"
   ],
   "debian": [
     "snapd",
@@ -23,7 +26,9 @@
     "python3-venv",
     "python3-poetry",
     "openjdk-21-jdk",
-    "fonts-powerline"
+    "fonts-powerline",
+    "docker.io",
+    "docker-compose"
   ],
   "dependencies": [
     "bash-completion",
@@ -61,7 +66,6 @@
   ],
   "gnome_debian": [
     "gnome-tweaks",
-    "gnome-shell-extension-manager",
     "gnome-software-plugin-flatpak",
     "gnome-shell-extension-manager",
     "gnome-shell-extension-appindicator",
