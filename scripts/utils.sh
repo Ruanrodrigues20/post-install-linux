@@ -174,9 +174,35 @@ install_pkg() {
 }
 
 
-install_f(){
-    for app in "${apps[@]}"; do
-        echo -e "\e[33mInstalling $app...\e[0m"
-        flatpak install -y flathub "$app"
-    done
+install_f() {
+  for app in "$@"; do
+    echo -e "\e[33mInstalling $app...\e[0m"
+    flatpak install -y flathub "$app"
+  done
 }
+
+
+_install_snaps() {
+  for snap in "$@"; do
+    if snap list "$snap" >/dev/null 2>&1; then
+      echo "✅ $snap is already installed. Skipping..."
+    else
+      echo "🔹 Installing: $snap"
+      sudo snap install "$snap" --classic
+    fi
+  done
+}
+
+
+
+get_data() {
+  local cod=$1
+  local dados=()
+  read -ra dados <<< "$(python3 scripts/list_packages.py "$cod")"
+  
+  # Usa o array local dentro da função, por exemplo:
+  printf '%s\n' "${dados[@]}"
+}
+
+
+

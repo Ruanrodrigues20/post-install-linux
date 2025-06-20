@@ -23,20 +23,19 @@ gtk_theme() {
 }
 
 clone_repositories() {
+    local reps=($(get_data themes))
     
-    local reps=()
-    read -ra reps <<< "$(python3 scripts/list_packages.py "themes")"
-
     for rep in "${reps[@]}"; do
         local folder=$(basename "$rep" .git)
         if [ -d "$folder" ]; then
             echo "📁 Repository '$folder' already cloned. Skipping."
         else
             echo "⬇️ Cloning '$rep'..."
-            git clone $rep
+            git clone "$rep"
         fi
     done
 }
+
 
 install_gtk_theme() {
     (

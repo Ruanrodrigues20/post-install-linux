@@ -9,13 +9,12 @@ source scripts/configs.sh
 check_dependencies(){
     echo -e "\e[1;34m===== 🔥 Installing Dependencies =====\e[0m"
 
-    local base_dir="./packages"
     local dependencies=()
+    get_data dependencies "dependencies"
 
-    dependencies=$(python3 scripts/list_packages.py "dependencies")
 
     if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "arch" ]; then
-        install $dependencies
+        install ${dependencies[@]}
     else
         echo "$DISTRO"
         return 1
@@ -25,11 +24,11 @@ check_dependencies(){
 install_packages() {
     echo -e "\e[1;34m===== 🔥 Installing Packages =====\e[0m"
 
-    if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "arch" ]; then
-        install $(python3 scripts/list_packages.py "common")
-        install $(python3 scripts/list_packages.py "$DISTRO")
+    if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "arch" ]; then        
+        install $(get_data common)
+        install $(get_data "$DISTRO")
         if is_gnome; then
-            install $(python3 scripts/list_packages.py "gnome_${DISTRO}")
+            install $(get_data "gnome_$DISTRO")
         fi
     else
         echo "Invalid Distro: $DISTRO"
@@ -40,7 +39,8 @@ install_packages() {
 install_fonts() {
     echo -e "\e[1;34m===== 🔥 Installing Fonts =====\e[0m"
     if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "arch" ]; then
-        install $(python3 scripts/list_packages.py "fonts_${DISTRO}")
+        install $(get_data "fonts_${DISTRO}")
+
         local font_dir="$HOME/.local/share/fonts"
         local tmp_dir="$(mktemp -d)"
 
@@ -65,39 +65,21 @@ install_fonts() {
 }
 
 
-
 snaps_install() {
-    if [ "$DISTRO" = "debian" ]; then
-        echo -e "\e[1;34m===== 🔥 Installing Snap Applications =====\e[0m"
-
-        # Converte a string retornada pelo Python em um array real
-        read -ra snaps <<< "$(python3 scripts/list_packages.py "snaps")"
-
-        for snap in "${snaps[@]}"; do
-            if snap list "$snap" >/dev/null 2>&1; then
-                echo -e "✅ $snap is already installed. Skipping..."
-            else
-                echo -e "🔹 Installing: $snap"
-                sudo snap install "$snap" --classic
-            fi
-        done
-    fi
+  if [ "$DISTRO" = "debian" ]; then
+    echo "===== 🔥 Installing Snap Applications ====="
+    _install_snaps $(get_data snaps)
+  fi
 }
 
 
 
-install_flatpaks(){
-    echo -e "\e[1;34m===== 🔥 Installing Flatpak Applications =====\e[0m"
-    echo ""
-
-    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-    local apps=()
-    # Transforma a string em array
-    read -ra apps <<< "$(python3 scripts/list_packages.py "flatpaks")"
-
-    install_f "${apps[@]}"
+install_flatpaks() {
+  echo -e "\e[1;34m===== 🔥 Installing Flatpak Applications =====\e[0m"
+  echo ""
+  flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+  install_f $(get_data flatpaks)
 }
-
 
 
 
@@ -106,14 +88,14 @@ downloads_debs() {
         echo -e "\e[1;34m===== 📥 Downloading Extra Software =====\e[0m"
         echo ""
 
-        read -ra links <<< "$(python3 scripts/list_packages.py "downloads_debs")"
 
         mkdir -p resources
 
         (
+            local downloads_debs=($(get_data downloads_debs))            
             cd resources || exit 1
 
-            for link in "${links[@]}"; do
+            for link in "${downloads_debs[@]}"; do
                 echo "🔹 Downloading: $link"
                 wget "$link"
             done
