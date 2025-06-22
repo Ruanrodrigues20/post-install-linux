@@ -2,12 +2,9 @@
 set -e
 
 gtk_theme() {
-    echo "Do you want to install the WhiteSur GTK theme? (y/n)"
-    read -p "Enter your choice: " choice
-    if [[ "$choice" != "y" && "$choice" != "Y" ]]; then
-        echo "Skipping GTK theme installation."
-        return
-    fi
+
+    echo -e "\e[1;34m===== 🔥 Installing GTK Theme =====\e[0m"
+
 
     mkdir -p resources
     (
@@ -24,6 +21,8 @@ gtk_theme() {
 
 clone_repositories() {
     local reps=($(get_data themes))
+    echo -e "\e[1;34m===== 🔥 Cloning Repositores =====\e[0m"
+
     
     for rep in "${reps[@]}"; do
         local folder=$(basename "$rep" .git)
@@ -90,6 +89,8 @@ install_w_themes() {
 
 
 apply_configs_themes() {
+    echo -e "\e[1;34m===== 🔥 Applying themes =====\e[0m"
+
     gsettings set org.gnome.desktop.interface gtk-theme 'WhiteSur-Dark-blue' \
         && echo "✅ GTK theme applied." || echo "❌ Failed to apply GTK theme."
     
@@ -114,6 +115,9 @@ apply_configs_themes() {
 
 
 configs_wallpapers() {
+
+    echo -e "\e[1;34m===== 🔥 Install Wallpapers =====\e[0m"
+
     local SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     local WALLPAPER_DIR="$HOME/.local/share/backgrounds"
 

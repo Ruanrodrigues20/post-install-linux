@@ -6,23 +6,21 @@
     "libreoffice-fresh-pt-br",
     "intellij-idea-ultimate-edition",
     "firefox",
+    "libnotify",
     "docker"
   ],
-  
-"fonts_arch": [
-  "ttf-ms-fonts",
-  "ttf-jetbrains-mono-nerd",
-  "ttf-fira-code",
-  "fonts-powerline",
-  "ttf-nerd-fonts-symbols"
-],
-
-"fonts_debian": [
-  "ttf-mscorefonts-installer",
-  "fonts-jetbrains-mono",
-  "fonts-firacode"
+  "fonts_arch": [
+    "ttf-ms-fonts",
+    "ttf-jetbrains-mono-nerd",
+    "ttf-fira-code",
+    "fonts-powerline",
+    "ttf-nerd-fonts-symbols"
   ],
-
+  "fonts_debian": [
+    "ttf-mscorefonts-installer",
+    "fonts-jetbrains-mono",
+    "fonts-firacode"
+  ],
   "common": [
     "vlc",
     "fastfetch",
@@ -40,7 +38,8 @@
     "python3-poetry",
     "openjdk-21-jdk",
     "docker.io",
-    "docker-compose"
+    "docker-compose",
+    "libnotify-bin"
   ],
   "dependencies": [
     "bash-completion",
@@ -91,7 +90,8 @@
   "snaps": [
     "notion-snap-reborn",
     "notion-calendar-snap",
-    "snap-store"
+    "snap-store",
+    "intellij-idea-ultimate"
   ],
   "reps_github":[
     "https://github.com/Ruanrodrigues20/intelliJ-install",
@@ -103,11 +103,9 @@
     "https://github.com/vinceliuice/WhiteSur-wallpapers.git",
     "https://github.com/vinceliuice/WhiteSur-cursors.git"
     ],
-
   "libreoffice": [
     "https://mirror.uepg.br/tdf/libreoffice/stable/25.2.4/deb/x86_64/LibreOffice_25.2.4_Linux_x86-64_deb.tar.gz",
     "https://tdf.c3sl.ufpr.br/libreoffice/stable/25.2.4/deb/x86_64/LibreOffice_25.2.4_Linux_x86-64_deb_langpack_pt-BR.tar.gz",
     "https://mirror.uepg.br/tdf/libreoffice/stable/25.2.4/deb/x86_64/LibreOffice_25.2.4_Linux_x86-64_deb_helppack_pt-BR.tar.gz"
   ]
-
 }

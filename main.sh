@@ -26,19 +26,44 @@ setup(){
     check_internet_connection
     detect_distro
     mkdir -p resources
+    
+}
+
+install_minimal(){
+    setup_yay
+    check_dependencies
+    install_packages
+    install_flatpaks
+    snaps_install
 }
 
 
-# ======================
-# Função principal
-# ======================
+install_complete(){
+    setup_yay
+    check_dependencies
+    install_packages
+    install_fonts
+    install_firefox_deb
+    downloads_debs
+    intellij_install
+    install_flatpaks
+    snaps_install
+    
 
-main() {
-    setup
+    #Configuração final
+    setup_aliases_and_tools
+    git_config
+    setup_tlp
+    setup_bt_service
+    configs
+    set_profile_picture_current_user
+    configs_keyboard
+    install_fonts
+    set_configs_fastfetch
 
-    show_logo
-    show_intro_message
+}
 
+install_full(){
     # Etapas principais
     setup_yay
     check_dependencies
@@ -65,12 +90,61 @@ main() {
     install_fonts
     set_configs_fastfetch
     install_oh_my_bash
-
-    show_summary
-    ask_to_restart
 }
 
 # ======================
-# Execução
+# Função principal
 # ======================
-main
+# Cores ANSI básicas
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+main() {
+    setup
+    show_logo
+
+    CHOOSE_INSTALL=$1
+
+    if [[ -z "$CHOOSE_INSTALL" ]]; then
+        echo -e "${CYAN}Please choose an installation type:${NC}"
+        select option in minimal complete full exit; do
+            case "$option" in
+                minimal|complete|full)
+                    CHOOSE_INSTALL=$option
+                    break
+                    ;;
+                exit)
+                    echo -e "${YELLOW}Exiting.${NC}"
+                    exit 0
+                    ;;
+                *)
+                    echo -e "${RED}Invalid choice. Please try again.${NC}"
+                    ;;
+            esac
+        done
+    fi
+
+    echo -e "${GREEN}Selected installation: $CHOOSE_INSTALL${NC}"
+
+    case "$CHOOSE_INSTALL" in
+        minimal) install_minimal ;;
+        complete) install_complete ;;
+        full) install_full ;;
+        *)
+            echo -e "${RED}Invalid installation option: $CHOOSE_INSTALL${NC}"
+            exit 1
+            ;;
+    esac
+
+    if command -v notify-send >/dev/null; then
+        notify-send -u normal -i dialog-information "✅ Post Install Completed" "Everything was installed successfully!"
+    fi
+
+    ask_to_restart
+}
+
+
+main "$@"

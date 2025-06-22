@@ -9,12 +9,8 @@ source scripts/configs.sh
 check_dependencies(){
     echo -e "\e[1;34m===== 🔥 Installing Dependencies =====\e[0m"
 
-    local dependencies=()
-    get_data dependencies "dependencies"
-
-
     if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "arch" ]; then
-        install ${dependencies[@]}
+        install $(get_data dependencies)
     else
         echo "$DISTRO"
         return 1
@@ -67,7 +63,8 @@ install_fonts() {
 
 snaps_install() {
   if [ "$DISTRO" = "debian" ]; then
-    echo "===== 🔥 Installing Snap Applications ====="
+    echo -e "\e[1;34m===== 🔥 Installing Snaps =====\e[0m"
+
     _install_snaps $(get_data snaps)
   fi
 }
@@ -117,6 +114,8 @@ downloads_debs() {
 intellij_install(){
     if [ "$DISTRO" = "debian" ]; then
         mkdir -p resources
+        echo -e "\e[1;34m===== 🔥 Installing IntelliJ =====\e[0m"
+
         (
             cd resources || return 1
             git clone https://github.com/Ruanrodrigues20/intelliJ-install || {

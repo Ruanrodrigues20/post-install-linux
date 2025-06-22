@@ -67,6 +67,7 @@ ask_to_restart(){
         rm -rf ~/.cache/yay/completion.cache
         yay -Syu
     fi
+    echo -e "\e[1;34m===== 🔥 Installing Finish =====\e[0m"
 
     read -p "Do you want to restart your system now? (y/n): " ans
     if [[ "$ans" == "y" || "$ans" == "Y" ]]; then
@@ -188,10 +189,15 @@ _install_snaps() {
       echo "✅ $snap is already installed. Skipping..."
     else
       echo "🔹 Installing: $snap"
-      sudo snap install "$snap" --classic
+      if sudo snap install "$snap" --classic; then
+        echo "✅ $snap installed successfully."
+      else
+        echo "❌ Failed to install $snap."
+      fi
     fi
   done
 }
+
 
 
 

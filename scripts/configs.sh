@@ -6,12 +6,12 @@
 
 setup_yay() {
     if [[ "$DISTRO" != "arch" ]]; then
-        echo "Yay é específico para Arch. Pulando..."
         return
     fi
     
     if ! command -v yay &>/dev/null; then
-        echo "Instalando yay..."
+        echo -e "\e[1;34m===== 🔥 Installing YAY =====\e[0m"
+
         sudo pacman -S --noconfirm --needed base-devel git
 
         mkdir -p resources
@@ -32,6 +32,8 @@ setup_yay() {
 
 install_theme_grub() {
     if grub-install --version &>/dev/null; then
+        echo -e "\e[1;34m===== 🔥 Installing Theme Grub =====\e[0m"
+
         sudo mkdir -p /boot/grub/themes
         
         (
@@ -39,8 +41,6 @@ install_theme_grub() {
             
             if [ ! -d grub2-themes ]; then
                 sudo git clone https://github.com/vinceliuice/grub2-themes.git
-            else
-                echo "📁 grub2-themes already exists. Skipping clone."
             fi
             
             cd grub2-themes || { echo "Failed to enter grub2-themes"; return 1; }
@@ -48,8 +48,6 @@ install_theme_grub() {
             sudo ./install.sh -t whitesur -i whitesur
             sudo update-grub
         )
-    else
-        echo "grub-install not found. Skipping GRUB theme installation."
     fi
 }
 
@@ -77,6 +75,8 @@ install_oh_my_bash() {
 
 
 git_config(){
+    echo -e "\e[1;34m===== 🔥 Git Config =====\e[0m"
+
     echo "Are you sure you want to set up git? (y/n)"
     read -p "Enter your choice: " choice
     if [[ "$choice" != "y" && "$choice" != "Y" ]]; then
