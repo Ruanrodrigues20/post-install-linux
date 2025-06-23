@@ -9,8 +9,8 @@ source scripts/configs.sh
 check_dependencies(){
     echo -e "\e[1;34m===== 🔥 Installing Dependencies =====\e[0m"
 
-    if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "arch" ]; then
-        install $(get_data dependencies)
+    if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "arch" ] || [ "$DISTRO" = "fedora" ]; then
+        install $(get_data common dependencies)
     else
         echo "$DISTRO"
         return 1
@@ -20,11 +20,16 @@ check_dependencies(){
 install_packages() {
     echo -e "\e[1;34m===== 🔥 Installing Packages =====\e[0m"
 
-    if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "arch" ]; then        
-        install $(get_data common)
-        install $(get_data "$DISTRO")
+    if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "arch" ] || [ "$DISTRO" = "fedora" ]; then        
+        install $(get_data common common)
+        install $(get_data "$DISTRO" $DISTRO)
         if is_gnome; then
-            install $(get_data "gnome_$DISTRO")
+            install $(get_data "$DISTRO" "gnome_$DISTRO")
+        fi
+
+        if [ "$DISTRO" = "fedora" ]; then
+            install_rpms
+            install_docker_fedora
         fi
     else
         echo "Invalid Distro: $DISTRO"
@@ -34,8 +39,8 @@ install_packages() {
 
 install_fonts() {
     echo -e "\e[1;34m===== 🔥 Installing Fonts =====\e[0m"
-    if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "arch" ]; then
-        install $(get_data "fonts_${DISTRO}")
+    if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "arch" ] || [ "$DISTRO" = "fedora" ]; then
+        install $(get_data "$DISTRO" "fonts_${DISTRO}")
 
         local font_dir="$HOME/.local/share/fonts"
         local tmp_dir="$(mktemp -d)"
@@ -62,10 +67,10 @@ install_fonts() {
 
 
 snaps_install() {
-  if [ "$DISTRO" = "debian" ]; then
+  if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "fedora" ]; then
     echo -e "\e[1;34m===== 🔥 Installing Snaps =====\e[0m"
 
-    _install_snaps $(get_data snaps)
+    _install_snaps $(get_data "$DISTRO" snaps)
   fi
 }
 
@@ -75,7 +80,7 @@ install_flatpaks() {
   echo -e "\e[1;34m===== 🔥 Installing Flatpak Applications =====\e[0m"
   echo ""
   flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-  install_f $(get_data flatpaks)
+  install_f $(get_data "$DISTRO" flatpaks)
 }
 
 
@@ -167,3 +172,39 @@ Pin-Priority: 1000
     fi
 }
 
+
+
+install_docker_fedora() {
+    echo "📦 Instalando Docker no Fedora..."
+
+    echo "🧪 Instalando dependências..."
+    sudo dnf install -y dnf-plugins-core curl
+
+    echo "➕ Adicionando repositório oficial da Docker..."
+  sudo tee /etc/yum.repos.d/docker-ce.repo > /dev/null <<EOF
+[docker-ce-stable]
+name=Docker CE Stable - \$basearch
+baseurl=https://download.docker.com/linux/fedora/\$releasever/\$basearch/stable
+enabled=1
+gpgcheck=1
+gpgkey=https://download.docker.com/linux/fedora/gpg
+EOF
+
+    echo "⬇️ Instalando Docker e componentes..."
+    sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+    echo "🚀 Ativando e iniciando o Docker..."
+    sudo  systemctl enable --now docker
+
+    echo "🧪 Testando com hello-world..."
+    sudo docker run hello-world
+
+    echo "✅ Docker instalado com sucesso!"
+}
+
+install_rpms(){
+    if [ "$DISTRO" = "fedora" ]; then
+        echo -e "\e[1;34m===== 🔥 Installing rpms =====\e[0m"
+        install $(get_data "$DISTRO" "rpms")
+    fi
+}

@@ -1,8 +1,12 @@
 #!/bin/bash
 set -e
+source scripts/utils.sh
 
 gtk_theme() {
-
+    if ! is_gnome; then
+        echo -e "\e[1;31mThis script is designed for GNOME environments only.\e[0m"
+        return 1
+    fi
     echo -e "\e[1;34m===== 🔥 Installing GTK Theme =====\e[0m"
 
 
@@ -20,7 +24,7 @@ gtk_theme() {
 }
 
 clone_repositories() {
-    local reps=($(get_data themes))
+    local reps=($(get_data common themes))
     echo -e "\e[1;34m===== 🔥 Cloning Repositores =====\e[0m"
 
     

@@ -1,0 +1,36 @@
+{
+    "common": [
+        "vlc",
+        "fastfetch",
+        "maven",
+        "ufw"
+    ],
+    "dependencies": [
+        "bash-completion",
+        "git",
+        "wget",
+        "curl",
+        "vim",
+        "tree",
+        "unzip",
+        "zip",
+        "tar"
+    ],
+    "flatpaks": [
+        "com.discordapp.Discord",
+        "org.gnome.DejaDup",
+        "io.github.realmazharhussain.GdmSettings",
+        "com.getpostman.Postman",
+        "io.missioncenter.MissionCenter"
+    ],
+    "reps_github":[
+        "https://github.com/Ruanrodrigues20/intelliJ-install",
+        "https://github.com/Ruanrodrigues20/wallpapers.git"
+    ],
+    "themes": [
+        "https://github.com/vinceliuice/WhiteSur-gtk-theme.git",
+        "https://github.com/vinceliuice/WhiteSur-icon-theme.git",
+        "https://github.com/vinceliuice/WhiteSur-wallpapers.git",
+        "https://github.com/vinceliuice/WhiteSur-cursors.git"
+    ]
+}

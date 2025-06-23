@@ -46,7 +46,11 @@ install_theme_grub() {
             cd grub2-themes || { echo "Failed to enter grub2-themes"; return 1; }
             
             sudo ./install.sh -t whitesur -i whitesur
-            sudo update-grub
+            if [ $DISTRO == "fedora" ]; then
+                sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+            else
+                sudo update-grub
+            fi
         )
     fi
 }
@@ -193,6 +197,12 @@ setup_tlp() {
         sudo apt install -y tlp tlp-rdw
         sudo systemctl enable tlp
         sudo systemctl start tlp
+        sudo tlp-stat -s
+    elif [[ "$DISTRO" == "fedora" ]]; then
+        sudo dnf install -y tlp tlp-rdw &> /dev/null
+        echo -e "\e[32m✔️  TLP installed successfully on Fedora.\e[0m"
+        sudo systemctl enable tlp.service &> /dev/null
+        sudo systemctl start tlp.service &> /dev/null
         sudo tlp-stat -s
     else
         echo -e "\e[31m❌  Unsupported distribution for installing TLP.\e[0m"

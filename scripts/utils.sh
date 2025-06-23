@@ -115,6 +115,8 @@ detect_distro() {
         DISTRO="debian"
     elif command -v pacman &> /dev/null; then
         DISTRO="arch"
+    elif command -v dnf &> /dev/null; then
+        DISTRO="fedora"
     else
         echo "Distribution not supported."
         exit 1
@@ -153,26 +155,38 @@ install() {
     done
 }
 
-
 install_pkg() {
     local pkg="$1"
-    if [ "$DISTRO" = "arch" ]; then
-        if ! pacman -Qi "$pkg" &> /dev/null; then
-            yay -S --noconfirm "$pkg"
-        else
-            echo -e "\e[32m✔️  $pkg is already installed.\e[0m"
-        fi
-    elif [ "$DISTRO" = "debian" ]; then
-        if ! dpkg -l | grep -E "^ii\s+$pkg" &> /dev/null; then
-            sudo apt install -y "$pkg"
-        else
-            echo -e "\e[32m✔️  $pkg is already installed.\e[0m"
-        fi
-    else
-        echo "Distribuição não suportada para instalação."
-        return 1
-    fi
+
+    case "$DISTRO" in
+        arch)
+            if ! pacman -Qi "$pkg" &> /dev/null; then
+                yay -S --noconfirm "$pkg"
+            else
+                echo -e "\e[32m✔️  $pkg is already installed.\e[0m"
+            fi
+            ;;
+        debian)
+            if ! dpkg -s "$pkg" &> /dev/null; then
+                sudo apt install -y "$pkg"
+            else
+                echo -e "\e[32m✔️  $pkg is already installed.\e[0m"
+            fi
+            ;;
+        fedora)
+            if ! rpm -q "$pkg" &> /dev/null; then
+                sudo dnf install -y "$pkg"
+            else
+                echo -e "\e[32m✔️  $pkg is already installed.\e[0m"
+            fi
+            ;;
+        *)
+            echo "❌ Distribuição não suportada para instalação: $DISTRO"
+            return 1
+            ;;
+    esac
 }
+
 
 
 install_f() {
@@ -200,13 +214,11 @@ _install_snaps() {
 
 
 
-
 get_data() {
-  local cod=$1
+  local distro=$1
+  local categoria=$2
   local dados=()
-  read -ra dados <<< "$(python3 scripts/list_packages.py "$cod")"
-  
-  # Usa o array local dentro da função, por exemplo:
+  read -ra dados <<< "$(python3 scripts/list_packages.py "$distro" "$categoria")"
   printf '%s\n' "${dados[@]}"
 }
 
