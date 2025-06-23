@@ -13,7 +13,6 @@ categoria = sys.argv[2]
 json_path = os.path.join('data', f'{distro}.json')
 
 if not os.path.isfile(json_path):
-    print(f"Arquivo JSON para '{distro}' não encontrado.", file=sys.stderr)
     sys.exit(1)
 
 with open(json_path) as f:

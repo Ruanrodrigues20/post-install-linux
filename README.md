@@ -1,6 +1,6 @@
 # 🛠️ Post-Install-Linux
 
-This is a **post-install automation script for Arch Linux-based and Debian-based systems**, designed to streamline the configuration of a fresh installation.
+This is a **post-install automation script for Arch Linux-based, Debian-based and Fedora-based systems**, designed to streamline the configuration of a fresh installation.
 
 ## 📁 Project Structure
 
