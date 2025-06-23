@@ -11,21 +11,23 @@ gtk_theme() {
 
 
     mkdir -p resources
+    clone_repositories
     (
-        cd resources
-        clone_repositories
         install_gtk_theme
         install_themes_icons
         install_theme_cursors
         install_w_themes
         apply_configs_themes
     )
+    cd ..
+
 
 }
 
 clone_repositories() {
     local reps=($(get_data common themes))
     echo -e "\e[1;34m===== 🔥 Cloning Repositores =====\e[0m"
+    cd resources
 
     
     for rep in "${reps[@]}"; do
