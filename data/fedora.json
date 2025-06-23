@@ -6,8 +6,9 @@
         "java-21-openjdk",
         "snapd",
         "maven",
-        "libreoffice-base",
+        "libreoffice",
         "libreoffice-langpack-pt-BR",
+        "libreoffice-help-pt-BR",
         "dnf-plugins-core"
     ],
     "gnome_fedora":[
