@@ -1,5 +1,5 @@
 {
-    "fedora":[
+    "apps":[
         "python3-pip",
         "python3-virtualenv",
         "python3-poetry",
@@ -9,32 +9,19 @@
         "libreoffice",
         "libreoffice-langpack-pt-BR",
         "libreoffice-help-pt-BR",
-        "dnf-plugins-core"
+        "dnf-plugins-core",
+        "obs-studio"
     ],
-    "gnome_fedora":[
+    "gnome":[
         "gnome-software",
         "gnome-tweaks",
         "gnome-shell-extension-appindicator",
         "gnome-shell-extension-blur-my-shell",
         "gnome-shell-extension-dash-to-dock",
-        "gnome-shell-extension-user-theme"
+        "gnome-shell-extension-user-theme",
+        "gnome-shell-extension-caffeine"
     ],
-    "flatpaks":[
-        "com.discordapp.Discord",
-        "org.gnome.DejaDup",
-        "io.github.realmazharhussain.GdmSettings",
-        "com.getpostman.Postman",
-        "io.missioncenter.MissionCenter",
-        "com.mattjakeman.ExtensionManager",
-        "com.obsproject.Studio",
-        "com.transmissionbt.Transmission"
-    ],
-    "snaps":[
-        "notion-snap-reborn",
-        "notion-calendar-snap",
-        "intellij-idea-ultimate"
-    ],
-    "fonts_fedora":[
+    "fonts":[
         "fira-code-fonts",
         "jetbrains-mono-fonts"
     ],

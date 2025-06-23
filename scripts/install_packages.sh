@@ -1,4 +1,5 @@
-#!bin/bash
+#!/bin/bash
+
 
 set -e
 
@@ -22,9 +23,9 @@ install_packages() {
 
     if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "arch" ] || [ "$DISTRO" = "fedora" ]; then        
         install $(get_data common common)
-        install $(get_data "$DISTRO" $DISTRO)
+        install $(get_data "$DISTRO" apps)
         if is_gnome; then
-            install $(get_data "$DISTRO" "gnome_$DISTRO")
+            install $(get_data "$DISTRO" "gnome")
         fi
 
         if [ "$DISTRO" = "fedora" ]; then
@@ -40,7 +41,7 @@ install_packages() {
 install_fonts() {
     echo -e "\e[1;34m===== 🔥 Installing Fonts =====\e[0m"
     if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "arch" ] || [ "$DISTRO" = "fedora" ]; then
-        install $(get_data "$DISTRO" "fonts_${DISTRO}")
+        install $(get_data "$DISTRO" "fonts")
 
         local font_dir="$HOME/.local/share/fonts"
         local tmp_dir="$(mktemp -d)"
@@ -70,7 +71,7 @@ snaps_install() {
   if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "fedora" ]; then
     echo -e "\e[1;34m===== 🔥 Installing Snaps =====\e[0m"
 
-    _install_snaps $(get_data "$DISTRO" snaps)
+    _install_snaps $(get_data common snaps)
   fi
 }
 
@@ -80,7 +81,7 @@ install_flatpaks() {
   echo -e "\e[1;34m===== 🔥 Installing Flatpak Applications =====\e[0m"
   echo ""
   flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-  install_f $(get_data "$DISTRO" flatpaks)
+  install_f $(get_data common flatpaks)
 }
 
 
@@ -94,24 +95,33 @@ downloads_debs() {
         mkdir -p resources
 
         (
-            local downloads_debs=($(get_data downloads_debs))            
+            local downloads_debs=($(get_data debian downloads_debs))            
             cd resources || exit 1
 
             for link in "${downloads_debs[@]}"; do
                 echo "🔹 Downloading: $link"
                 wget "$link"
             done
-
-            local programs=(./*.deb)
-            
-            for p in "${programs[@]}"; do
-                sudo dpkg -i $p
-            done
-            rm ./*.deb
-
         )
 
-        corrigir_vscode_sources
+    fi
+}
+
+install_debs(){
+    if [ "$DISTRO" = "debian" ]; then
+        echo -e "\e[1;34m===== 🔥 Installing DEB Packages =====\e[0m"
+        echo ""
+
+        (
+            cd resources || exit 1
+             local programs=(./*.deb)
+            
+            for p in "${programs[@]}"; do
+                install $p
+            done
+            rm ./*.deb
+            corrigir_vscode_sources
+        )
     fi
 }
 
@@ -191,7 +201,14 @@ gpgkey=https://download.docker.com/linux/fedora/gpg
 EOF
 
     echo "⬇️ Instalando Docker e componentes..."
-    sudo dnf install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    apps=(
+        docker-ce
+        docker-ce-cli
+        containerd.io
+        docker-buildx-plugin
+        docker-compose-plugin
+    )
+    install $apps
 
     echo "🚀 Ativando e iniciando o Docker..."
     sudo  systemctl enable --now docker

@@ -45,6 +45,7 @@ install_complete(){
     install_fonts
     install_firefox_deb
     downloads_debs
+    install_debs
     intellij_install
     install_flatpaks
     snaps_install
@@ -71,6 +72,7 @@ install_full(){
     install_fonts
     install_firefox_deb
     downloads_debs
+    install_debs
     intellij_install
     install_flatpaks
     snaps_install

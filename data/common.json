@@ -14,6 +14,7 @@
         "tree",
         "unzip",
         "zip",
+        "whiptail",
         "tar"
     ],
     "flatpaks": [
@@ -21,7 +22,9 @@
         "org.gnome.DejaDup",
         "io.github.realmazharhussain.GdmSettings",
         "com.getpostman.Postman",
-        "io.missioncenter.MissionCenter"
+        "io.missioncenter.MissionCenter",
+        "com.mattjakeman.ExtensionManager",
+        "com.transmissionbt.Transmission"
     ],
     "reps_github":[
         "https://github.com/Ruanrodrigues20/intelliJ-install",
@@ -32,5 +35,12 @@
         "https://github.com/vinceliuice/WhiteSur-icon-theme.git",
         "https://github.com/vinceliuice/WhiteSur-wallpapers.git",
         "https://github.com/vinceliuice/WhiteSur-cursors.git"
+    ],
+     "snaps":[
+        "notion-snap-reborn",
+        "notion-calendar-snap",
+        "snap-store",
+        "intellij-idea-ultimate"
     ]
+
 }
