@@ -1,17 +1,15 @@
 #!/bin/bash
 
-
 set -e
 
 source scripts/utils.sh
 source scripts/configs.sh
 
-
 check_dependencies(){
     echo -e "\e[1;34m===== 🔥 Installing Dependencies =====\e[0m"
 
     if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "arch" ] || [ "$DISTRO" = "fedora" ]; then
-        install $(get_data common dependencies)
+        install pkg $(get_data common dependencies)
     else
         echo "$DISTRO"
         return 1
@@ -22,10 +20,10 @@ install_packages() {
     echo -e "\e[1;34m===== 🔥 Installing Packages =====\e[0m"
 
     if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "arch" ] || [ "$DISTRO" = "fedora" ]; then        
-        install $(get_data common common)
-        install $(get_data "$DISTRO" apps)
+        install pkg $(get_data common common)
+        install pkg $(get_data "$DISTRO" apps)
         if is_gnome; then
-            install $(get_data "$DISTRO" "gnome")
+            install pkg $(get_data "$DISTRO" "gnome")
         fi
 
         if [ "$DISTRO" = "fedora" ]; then
@@ -41,7 +39,7 @@ install_packages() {
 install_fonts() {
     echo -e "\e[1;34m===== 🔥 Installing Fonts =====\e[0m"
     if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "arch" ] || [ "$DISTRO" = "fedora" ]; then
-        install $(get_data "$DISTRO" "fonts")
+        install pkg $(get_data "$DISTRO" "fonts")
 
         local font_dir="$HOME/.local/share/fonts"
         local tmp_dir="$(mktemp -d)"
@@ -66,31 +64,27 @@ install_fonts() {
     fi
 }
 
-
 snaps_install() {
-  if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "fedora" ]; then
-    echo -e "\e[1;34m===== 🔥 Installing Snaps =====\e[0m"
-
-    _install_snaps $(get_data common snaps)
-  fi
+    if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "fedora" ]; then
+        echo -e "\e[1;34m===== 🔥 Installing Snaps =====\e[0m"
+        if [[ "$DISTRO" == "fedora" && ! -e /snap ]]; then
+            sudo ln -s /var/lib/snapd/snap /snap
+        fi
+        install snap $(get_data common snaps)
+    fi
 }
-
-
 
 install_flatpaks() {
-  echo -e "\e[1;34m===== 🔥 Installing Flatpak Applications =====\e[0m"
-  echo ""
-  flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-  install_f $(get_data common flatpaks)
+    echo -e "\e[1;34m===== 🔥 Installing Flatpak Applications =====\e[0m"
+    echo ""
+    flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+    install flatpak $(get_data common flatpaks)
 }
-
-
 
 downloads_debs() {
     if [ "$DISTRO" = "debian" ]; then
         echo -e "\e[1;34m===== 📥 Downloading Extra Software =====\e[0m"
         echo ""
-
 
         mkdir -p resources
 
@@ -103,7 +97,6 @@ downloads_debs() {
                 wget "$link"
             done
         )
-
     fi
 }
 
@@ -114,17 +107,16 @@ install_debs(){
 
         (
             cd resources || exit 1
-             local programs=(./*.deb)
-            
+            local programs=(./*.deb)
+
             for p in "${programs[@]}"; do
-                install $p
+                install pkg $p
             done
             rm ./*.deb
             corrigir_vscode_sources
         )
     fi
 }
-
 
 intellij_install(){
     if [ "$DISTRO" = "debian" ]; then
@@ -142,8 +134,6 @@ intellij_install(){
         )
     fi
 }
-
-
 
 install_firefox_deb() {
     if [ "$DISTRO" = "debian" ]; then
@@ -177,21 +167,20 @@ Pin-Priority: 1000
                 sudo snap remove firefox >/dev/null 2>&1
             fi
 
-            sudo apt update && sudo apt install -y firefox
+            sudo apt update
+            install pkg firefox
         fi
     fi
 }
-
-
 
 install_docker_fedora() {
     echo "📦 Instalando Docker no Fedora..."
 
     echo "🧪 Instalando dependências..."
-    sudo dnf install -y dnf-plugins-core curl
+    install pkg dnf-plugins-core curl
 
     echo "➕ Adicionando repositório oficial da Docker..."
-  sudo tee /etc/yum.repos.d/docker-ce.repo > /dev/null <<EOF
+    sudo tee /etc/yum.repos.d/docker-ce.repo > /dev/null <<EOF
 [docker-ce-stable]
 name=Docker CE Stable - \$basearch
 baseurl=https://download.docker.com/linux/fedora/\$releasever/\$basearch/stable
@@ -208,10 +197,10 @@ EOF
         docker-buildx-plugin
         docker-compose-plugin
     )
-    install $apps
+    install pkg $apps
 
     echo "🚀 Ativando e iniciando o Docker..."
-    sudo  systemctl enable --now docker
+    sudo systemctl enable --now docker
 
     echo "🧪 Testando com hello-world..."
     sudo docker run hello-world
@@ -222,6 +211,6 @@ EOF
 install_rpms(){
     if [ "$DISTRO" = "fedora" ]; then
         echo -e "\e[1;34m===== 🔥 Installing rpms =====\e[0m"
-        install $(get_data "$DISTRO" "rpms")
+        install pkg $(get_data "$DISTRO" "rpms")
     fi
 }

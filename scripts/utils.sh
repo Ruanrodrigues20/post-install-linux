@@ -142,18 +142,25 @@ detect_battery() {
 
 
 install() {
+    local type="$1"
+    shift  # remove o primeiro argumento (tipo)
     local packages=("$@")
 
-    if [ "$DISTRO" = "debian" ]; then
-        remove_trava
+    if [[ "$type" == "flatpak" ]]; then
+        install_f "${packages[@]}"
+        return
+    elif [[ "$type" == "snap" ]]; then
+        _install_snaps "${packages[@]}"
+        return
+    elif [[ "$type" == "pkg" ]]; then
+        for pkg in "${packages[@]}"; do
+            echo ""
+            echo -e "\e[33mInstalling $pkg...\e[0m"
+            install_pkg "$pkg"
+        done
     fi
-
-    for pkg in "${packages[@]}"; do
-        echo ""
-        echo -e "\e[33mInstalling $pkg...\e[0m"
-        install_pkg "$pkg"
-    done
 }
+
 
 install_pkg() {
     local pkg="$1"
@@ -167,6 +174,7 @@ install_pkg() {
             fi
             ;;
         debian)
+            remove_trava
             if ! dpkg -s "$pkg" &> /dev/null; then
                 sudo apt install -y "$pkg"
             else
