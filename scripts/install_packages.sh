@@ -199,6 +199,8 @@ EOF
     )
     install pkg $apps
 
+    sudo usermod -aG docker $USER
+
     echo "🚀 Ativando e iniciando o Docker..."
     sudo systemctl enable --now docker
 
