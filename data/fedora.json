@@ -10,11 +10,14 @@
         "libreoffice-langpack-pt-BR",
         "libreoffice-help-pt-BR",
         "dnf-plugins-core",
-        "obs-studio"
+        "totem",
+        "gstreamer1-plugins-bad-freeworld",
+        "gstreamer1-libav"
     ],
     "gnome":[
         "gnome-software",
         "gnome-tweaks",
+        "gnome-terminal",
         "gnome-shell-extension-appindicator",
         "gnome-shell-extension-blur-my-shell",
         "gnome-shell-extension-dash-to-dock",

@@ -1,5 +1,6 @@
 {
     "apps": [
+        "vlc",
         "jdk21-openjdk",
         "python-pip",
         "visual-studio-code-bin",

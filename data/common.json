@@ -1,6 +1,5 @@
 {
     "common": [
-        "vlc",
         "fastfetch",
         "maven",
         "ufw"
