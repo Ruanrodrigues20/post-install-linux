@@ -22,8 +22,7 @@
         "io.github.realmazharhussain.GdmSettings",
         "com.getpostman.Postman",
         "io.missioncenter.MissionCenter",
-        "com.mattjakeman.ExtensionManager",
-        "com.transmissionbt.Transmission"
+        "com.mattjakeman.ExtensionManager"
     ],
     "reps_github":[
         "https://github.com/Ruanrodrigues20/intelliJ-install",

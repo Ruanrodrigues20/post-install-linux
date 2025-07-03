@@ -12,12 +12,14 @@
         "dnf-plugins-core",
         "totem",
         "gstreamer1-plugins-bad-freeworld",
-        "gstreamer1-libav"
+        "gstreamer1-libav",
+        "transmission"
     ],
     "gnome":[
         "gnome-software",
         "gnome-tweaks",
         "gnome-terminal",
+        "gnome-terminal-nautilus",
         "gnome-shell-extension-appindicator",
         "gnome-shell-extension-blur-my-shell",
         "gnome-shell-extension-dash-to-dock",

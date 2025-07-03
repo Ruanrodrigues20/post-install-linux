@@ -31,7 +31,7 @@ setup(){
 
 install_minimal(){
     setup_yay
-    check_dependencies
+    install_dependencies
     install_packages
     install_flatpaks
     snaps_install
@@ -40,7 +40,7 @@ install_minimal(){
 
 install_complete(){
     setup_yay
-    check_dependencies
+    install_dependencies
     install_packages
     install_fonts
     install_firefox_deb
@@ -67,7 +67,7 @@ install_complete(){
 install_full(){
     # Etapas principais
     setup_yay
-    check_dependencies
+    install_dependencies
     install_packages
     install_fonts
     install_firefox_deb

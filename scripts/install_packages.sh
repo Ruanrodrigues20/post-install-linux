@@ -5,7 +5,7 @@ set -e
 source scripts/utils.sh
 source scripts/configs.sh
 
-check_dependencies(){
+install_dependencies(){
     echo -e "\e[1;34m===== 🔥 Installing Dependencies =====\e[0m"
 
     if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "arch" ] || [ "$DISTRO" = "fedora" ]; then
