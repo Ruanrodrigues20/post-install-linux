@@ -20,7 +20,7 @@ fi
 
 # Initial setup steps
 setup(){
-    for module in scripts/*.sh; do
+    for module in src/*.sh; do
         source "$module"
     done
     check_internet_connection

@@ -2,8 +2,8 @@
 
 set -e
 
-source scripts/utils.sh
-source scripts/configs.sh
+source src/utils.sh
+source src/configs.sh
 
 install_dependencies(){
     echo -e "\e[1;34m===== 🔥 Installing Dependencies =====\e[0m"

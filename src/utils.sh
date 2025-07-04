@@ -111,17 +111,21 @@ update(){
 
 
 detect_distro() {
-    if command -v apt &> /dev/null; then
+    source /etc/os-release
+    local distro_name="$NAME"
+
+    if [[ "$distro_name" == *"Debian"* ]]; then
         DISTRO="debian"
-    elif command -v pacman &> /dev/null; then
+    elif [[ "$distro_name" == *"Arch"* ]]; then
         DISTRO="arch"
-    elif command -v dnf &> /dev/null; then
+    elif [[ "$distro_name" == *"Fedora"* ]]; then
         DISTRO="fedora"
     else
         echo "Distribution not supported."
         exit 1
     fi
 }
+
 
 is_gnome() {
     if gnome-shell --version >/dev/null 2>&1; then
@@ -226,7 +230,7 @@ get_data() {
   local distro=$1
   local categoria=$2
   local dados=()
-  read -ra dados <<< "$(python3 scripts/list_packages.py "$distro" "$categoria")"
+  read -ra dados <<< "$(python3 src/list_packages.py "$distro" "$categoria")"
   printf '%s\n' "${dados[@]}"
 }
 
