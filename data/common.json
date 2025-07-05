@@ -2,7 +2,8 @@
     "common": [
         "fastfetch",
         "maven",
-        "ufw"
+        "ufw",
+        "vlc"
     ],
     "dependencies": [
         "bash-completion",
