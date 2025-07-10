@@ -6,6 +6,11 @@
 
 set -e
 
+BASEDIR="$(dirname "$(readlink -f "$0")")"
+cd "$BASEDIR" || exit 1
+
+# agora os comandos que usam src/*.sh vão funcionar corretamente
+
 # Save all output to a log file
 exec > >(tee -a "log.txt") 2>&1
 
