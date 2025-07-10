@@ -4,6 +4,13 @@ gi.require_version("Gtk", "4.0")
 gi.require_version("Adw", "1")
 from gi.repository import Adw
 from src.gui.main_window import MainWindow
+from src.configs.env import DISTRO
+from src.utils.utils import check_connection, ask_to_restart, get_data
+from src.utils.system import remove_lock_files, is_gnome, install, get_distro
+from src.scripts.theme import gtk_theme
+from src.scripts.install_packages import install_dependencies
+import src.scripts.install_packages as ins
+
 
 
 class PostInstallApp(Adw.Application):
@@ -18,5 +25,6 @@ class PostInstallApp(Adw.Application):
 if __name__ == "__main__":
     import sys
 
-    from src.configs.env import DISTRO
-    print(DISTRO)
+    ins.install_flatpaks()
+    
+    

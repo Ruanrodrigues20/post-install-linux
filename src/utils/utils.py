@@ -1,40 +1,34 @@
 import subprocess
 import sys
-
-def _get_distro():
-    """
-    Get the name of the Linux distribution from /etc/os-release.
-    Returns the distribution name as a string, or None if not found.
-    """
-    result = subprocess.run(
-        ["cat", "/etc/os-release"],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-
-    for line in result.stdout.strip().split("\n"):
-        if line.startswith("NAME="):
-            # Remove NAME= e possíveis aspas
-            return line.split("=", 1)[1].strip().strip('"').strip("'")
-    return None  # se não achar
+import os
+import json
+from src.utils.system import get_distro
 
 
-def get_distro():
-    """
-    return this system's distribution name
-    """
-    type_distro = ""
-    distro = _get_distro().lower()
-    if "fedora" in distro:
-        type_distro = "fedora"
-    elif "debian" in distro or "ubuntu" in distro or "linuxmint" in distro or "pop!_os" in distro:
-        type_distro = "debian"
-    elif "arch" in distro:
-        type_distro = "arch"
-    else:
-        raise ValueError(f"Unsupported distribution: {distro}")
-    return type_distro
+
+# Caminho absoluto para o diretório onde está o script atual
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# Caminho absoluto para a pasta data
+DATA_DIR = os.path.join(BASE_DIR, '../../data')
+
+def get_data(distro: str, categoria: str) -> list[str]:
+    json_path = os.path.join(DATA_DIR, f'{distro}.json')
+
+    if not os.path.isfile(json_path):
+        print(f"⚠️ JSON file not found: {json_path}")
+        return []
+
+    with open(json_path, 'r') as f:
+        try:
+            data = json.load(f)
+        except json.JSONDecodeError:
+            print(f"⚠️ Error decoding JSON file: {json_path}")
+            return []
+
+    return data.get(categoria, [])
+
+
 
 
 def check_connection():    
@@ -54,9 +48,33 @@ def check_connection():
         print("\033[1;31m❌ No internet connection detected. Please check your network.\033[0m")
         sys.exit(1)
 
+def ask_to_restart():
+    DISTRO = get_distro()
+    if DISTRO == "arch":
+        subprocess.run(["yay", "-Sy", "--aur", "--devel", "--timeupdate"])
+        subprocess.run(["rm", "-rf", os.path.expanduser("~/.cache/yay/completion.cache")])
+        subprocess.run(["yay", "-Syu"])
+
+    print("\033[1;34m===== 🔥 Installing Finished =====\033[0m")
+
+    choice = input("Do you want to restart your system now? (y/n): ") 
+    if choice.lower() == 'y':
+        print("\033[1;34m🔄 Restarting your system...\033[0m")
+        subprocess.run(["sudo", "systemctl", "reboot"])
+    else:
+        print("\033[1;33m⚠️ You can restart later to complete the installation.\033[0m")
 
 
-if __name__ == "__main__":
-    name = D
-    print(name)
-    check_connection()
+def detect_battery() -> bool:
+    """
+    Verifica se o sistema possui uma bateria (BAT0 ou BAT1).
+
+    Returns:
+        bool: True se houver bateria, False caso contrário.
+    """
+    return (
+        os.path.isdir("/sys/class/power_supply/BAT0") or
+        os.path.isdir("/sys/class/power_supply/BAT1")
+    )
+
+
