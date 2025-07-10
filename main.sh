@@ -1,4 +1,4 @@
-#!/bin/bash
+# !/bin/bash
 # System Setup Script
 # Author: Ruan
 # Description: Automates system setup for Debian/Arch-based systems

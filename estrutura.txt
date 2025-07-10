@@ -1,10 +1,8 @@
-# 🛠️ Post-Install-Linux
+## 📁 Estrutura do Projeto `post-install-linux`
 
-This is a **post-install automation script for Arch Linux-based, Debian-based, and Fedora-based systems**, designed to streamline the configuration of a fresh installation.
+Este projeto organiza scripts e dados para automatizar a instalação e configuração de sistemas Linux após a instalação. Ele é modular, extensível e preparado tanto para execução via terminal quanto para futura interface gráfica com GTK4.
 
-## 📁 Project Structure
-
-``
+```
 post-install-linux/
 │
 ├── data/                 
@@ -37,28 +35,12 @@ post-install-linux/
 └── estrutura.txt         # (Opcional) Esboço da estrutura do projeto. Pode ser movido para docs/
 ```
 
-## 🚀 What It Does
+---
 
-* ✅ Checks internet connection
-* 📦 Installs essential packages using `yay` (Arch), `apt` (Debian), or `dnf` (Fedora)
-* 📦 Installs Flatpak applications
-* 🎨 Applies GTK themes
-* 🧑‍💻 Configures Git
-* 🔧 Sets up aliases and useful tools
-* 📂 Creates standard directories
-* 🔋 Configures power-saving with TLP
-* 🖼️ Applies wallpapers
-* 📃 Shows a summary and asks to restart
+### ✅ Convenções adotadas
 
-## ▶️ Quick Usage
+* **Separação de responsabilidades**: dados, scripts bash, scripts Python e interface gráfica estão organizados em pastas distintas.
+* **Modularidade**: scripts pequenos e específicos, facilitando manutenção e testes.
+* **Pronto para CLI e GUI**: `main.sh` para terminal e `postinstall.py` para integração com GTK4.
+* **Multi-distro**: suporte inicial para Arch, Debian e Fedora.
 
-Run the following one-liner in your terminal:
-
-```bash
-git clone https://github.com/Ruanrodrigues20/Post-Install-Linux.git && cd Post-Install-Linux && bash ./main.sh
-```
-
-
-## 📜 License
-
-See `LICENSE.txt` for license information.
