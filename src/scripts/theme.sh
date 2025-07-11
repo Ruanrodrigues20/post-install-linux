@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
-source src/utils.sh
+source src/scripts/utils.sh
+$RESOURCES = src/resources 
 
 gtk_theme() {
     if ! is_gnome; then
@@ -10,7 +11,7 @@ gtk_theme() {
     echo -e "\e[1;34m===== 🔥 Installing GTK Theme =====\e[0m"
 
 
-    mkdir -p resources
+    mkdir -p $RESOURCES
     clone_repositories
     (
         install_gtk_theme
@@ -27,7 +28,7 @@ gtk_theme() {
 clone_repositories() {
     local reps=($(get_data common themes))
     echo -e "\e[1;34m===== 🔥 Cloning Repositores =====\e[0m"
-    cd resources
+    cd $RESOURCES
 
     
     for rep in "${reps[@]}"; do
@@ -127,10 +128,10 @@ configs_wallpapers() {
     local SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     local WALLPAPER_DIR="$HOME/.local/share/backgrounds"
 
-    mkdir -p resources
+    mkdir -p $RESOURCES
 
     (
-        cd resources || { echo "Failed to enter resources directory"; return 1; }
+        cd $RESOURCES || { echo "Failed to enter resources directory"; return 1; }
 
         if [ ! -d wallpapers ]; then
             git clone https://github.com/Ruanrodrigues20/wallpapers.git

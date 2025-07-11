@@ -230,7 +230,7 @@ get_data() {
   local distro=$1
   local categoria=$2
   local dados=()
-  read -ra dados <<< "$(python3 src/list_packages.py "$distro" "$categoria")"
+    read -ra dados <<< "$(python3 -c 'from src.scripts.list_packages import get_data; print(get_data("'"$distro"'", "'"$categoria"'"))')"
   printf '%s\n' "${dados[@]}"
 }
 

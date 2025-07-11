@@ -2,8 +2,10 @@
 
 set -e
 
-source src/utils.sh
-source src/configs.sh
+source src/scripts/utils.sh
+source src/scripts/configs.sh
+
+$RESOURCES = src/resources 
 
 install_dependencies(){
     echo -e "\e[1;34m===== 🔥 Installing Dependencies =====\e[0m"
@@ -86,11 +88,11 @@ downloads_debs() {
         echo -e "\e[1;34m===== 📥 Downloading Extra Software =====\e[0m"
         echo ""
 
-        mkdir -p resources
+        mkdir -p $RESOURCES
 
         (
             local downloads_debs=($(get_data debian downloads_debs))            
-            cd resources || exit 1
+            cd $RESOURCES || exit 1
 
             for link in "${downloads_debs[@]}"; do
                 echo "🔹 Downloading: $link"
@@ -106,7 +108,7 @@ install_debs(){
         echo ""
 
         (
-            cd resources || exit 1
+            cd $RESOURCES || exit 1
             local programs=(./*.deb)
 
             for p in "${programs[@]}"; do
@@ -120,11 +122,11 @@ install_debs(){
 
 intellij_install(){
     if [ "$DISTRO" = "debian" ]; then
-        mkdir -p resources
+        mkdir -p $RESOURCES
         echo -e "\e[1;34m===== 🔥 Installing IntelliJ =====\e[0m"
 
         (
-            cd resources || return 1
+            cd $RESOURCES || return 1
             git clone https://github.com/Ruanrodrigues20/intelliJ-install || {
                 echo "❌ Failed to clone intelliJ-install repository."
                 return 1
@@ -142,7 +144,7 @@ install_firefox_deb() {
             echo -e "\e[1;34m===== 🔥 Installing Firefox (DEB) =====\e[0m"
             echo ""
 
-            remove_trava  # <- suponho que essa função esteja definida
+            remove_trava  
 
             sudo install -d -m 0755 /etc/apt/keyrings
 

@@ -25,7 +25,7 @@ fi
 
 # Initial setup steps
 setup(){
-    for module in src/*.sh; do
+    for module in src/scripts/*.sh; do
         source "$module"
     done
     check_internet_connection
@@ -74,7 +74,6 @@ install_full(){
     setup_yay
     install_dependencies
     install_packages
-    install_fonts
     install_firefox_deb
     downloads_debs
     install_debs
