@@ -49,6 +49,17 @@ def install_packages():
         install_docker_fedora()
 
 
+def install_rpms():
+    print("\033[1;34m===== 🔥 Installing RPMs Applications =====\033[0m")
+    print()
+
+    rpms = get_data("common", "flatpaks")
+    if rpms:
+        install("rpm", rpms)
+
+
+
+
 
 def install_fonts():
     print("\033[1;34m===== 🔥 Installing Fonts =====\033[0m")
@@ -60,7 +71,7 @@ def install_fonts():
     # Instala fontes da distro via package manager
     fonts = get_data(DISTRO, "fonts")
     if fonts:
-        install("pkg", *fonts)
+        install("pkg", fonts)
 
     # Diretório de fontes local
     font_dir = os.path.expanduser("~/.local/share/fonts")
