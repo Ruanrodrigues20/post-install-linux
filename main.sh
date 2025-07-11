@@ -30,9 +30,12 @@ setup(){
     done
     check_internet_connection
     detect_distro
-    mkdir -p resources
+    RESOURCES=src/resources
+    DISTRO=$(detect_distro)
+
     
 }
+
 
 install_minimal(){
     setup_yay
@@ -118,7 +121,7 @@ main() {
         echo -e "${CYAN}Please choose an installation type:${NC}"
         select option in minimal complete full exit; do
             case "$option" in
-                minimal|complete|full)
+                minimal|complete|full|test)
                     CHOOSE_INSTALL=$option
                     break
                     ;;
@@ -139,6 +142,7 @@ main() {
         minimal) install_minimal ;;
         complete) install_complete ;;
         full) install_full ;;
+        test) test ;;
         *)
             echo -e "${RED}Invalid installation option: $CHOOSE_INSTALL${NC}"
             exit 1

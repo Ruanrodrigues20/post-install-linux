@@ -1,7 +1,6 @@
 #!/bin/bash
 set -e
 source src/scripts/utils.sh
-$RESOURCES = src/resources 
 
 gtk_theme() {
     if ! is_gnome; then

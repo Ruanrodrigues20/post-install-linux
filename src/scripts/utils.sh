@@ -193,7 +193,7 @@ install_pkg() {
             fi
             ;;
         *)
-            echo "❌ Distribuição não suportada para instalação: $DISTRO"
+            echo "❌ This distro not suported: $DISTRO"
             return 1
             ;;
     esac
@@ -210,28 +210,28 @@ install_f() {
 
 
 _install_snaps() {
-  for snap in "$@"; do
-    if snap list "$snap" >/dev/null 2>&1; then
-      echo "✅ $snap is already installed. Skipping..."
-    else
-      echo "🔹 Installing: $snap"
-      if sudo snap install "$snap" --classic; then
-        echo "✅ $snap installed successfully."
-      else
-        echo "❌ Failed to install $snap."
-      fi
-    fi
-  done
+    for snap in "$@"; do
+        if snap list "$snap" >/dev/null 2>&1; then
+        echo "✅ $snap is already installed. Skipping..."
+        else
+        echo "🔹 Installing: $snap"
+        if sudo snap install "$snap" --classic; then
+            echo "✅ $snap installed successfully."
+        else
+            echo "❌ Failed to install $snap."
+        fi
+        fi
+    done
 }
 
 
 
 get_data() {
-  local distro=$1
-  local categoria=$2
-  local dados=()
-    read -ra dados <<< "$(python3 -c 'from src.scripts.list_packages import get_data; print(get_data("'"$distro"'", "'"$categoria"'"))')"
-  printf '%s\n' "${dados[@]}"
+    local distro=$1
+    local categoria=$2
+    local dados=()
+    read -ra dados <<< "$(python3 -c 'from src.scripts.utils import get_data; print(get_data("'"$distro"'", "'"$categoria"'"))')"
+    printf '%s\n' "${dados[@]}"
 }
 
 

@@ -5,7 +5,6 @@ set -e
 source src/scripts/utils.sh
 source src/scripts/configs.sh
 
-$RESOURCES = src/resources 
 
 install_dependencies(){
     echo -e "\e[1;34m===== 🔥 Installing Dependencies =====\e[0m"
