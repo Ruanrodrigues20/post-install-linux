@@ -1,0 +1,20 @@
+[project]
+name = "post-install-linux"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Ruanrodrigues20",email = "ruan.rodrigues.silvaa@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.11,<4.0"
+dependencies = [
+    "customtkinter (>=5.2.2,<6.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "post_install_linux", from = "src"}]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
