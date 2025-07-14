@@ -1,192 +1,164 @@
-import gi
-gi.require_version("Gtk", "4.0")
-from gi.repository import Gtk, GLib
-
 import sys
 import builtins
 import threading
 import subprocess
+import tkinter as tk
+from tkinter import scrolledtext, simpledialog, messagebox
+from src.post_install_linux.backend.controller import Controller
 
-# Controller simulado que executa comandos e envia output para a GUI
-class Controller:
-    def __init__(self, output_buffer):
-        self.output_buffer = output_buffer
-
-    def run_command(self, cmd):
-        print(f"Executando comando: {' '.join(cmd)}\n")
-        process = subprocess.Popen(cmd,
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.STDOUT,
-                                   text=True,
-                                   bufsize=1,
-                                   universal_newlines=True)
-
-        for line in process.stdout:
-            # Atualiza buffer GTK na thread principal
-            GLib.idle_add(self.append_text, line)
-        process.stdout.close()
-        process.wait()
-
-    def append_text(self, text):
-        end_iter = self.output_buffer.get_end_iter()
-        self.output_buffer.insert(end_iter, text)
-
-        # Scroll automático
-        mark = self.output_buffer.create_mark(None, self.output_buffer.get_end_iter(), True)
-        self.output_buffer.place_cursor(mark)
-        self.output_buffer.delete_mark(mark)
-
-    def install_full(self):
-        # Exemplo: lista arquivos /tmp (troque pelos seus comandos)
-        self.run_command(["ls", "-l", "/tmp"])
-
-    def install_packages(self):
-        self.run_command(["echo", "Simulando instalação de pacotes..."])
-
-    def install_gtk_theme(self):
-        self.run_command(["echo", "Aplicando tema GTK..."])
-
-    def install_oh_my_bash(self):
-        self.run_command(["echo", "Configurando Oh My Bash..."])
+DARK_BG = "#181818"
+DARK_FG = "#f1f1f1"
+DARK_ACCENT = "#222222"
+DARK_ENTRY = "#232323"
+DARK_BTN = "#282828"
+DARK_BTN_ACTIVE = "#333333"
 
 class TextRedirector:
-    def __init__(self, buffer):
-        self.buffer = buffer
+    def __init__(self, widget):
+        self.widget = widget
 
     def write(self, text):
-        GLib.idle_add(self._write, text)
-
-    def _write(self, text):
-        end_iter = self.buffer.get_end_iter()
-        self.buffer.insert(end_iter, text)
-
-        mark = self.buffer.create_mark(None, self.buffer.get_end_iter(), True)
-        self.buffer.place_cursor(mark)
-        self.buffer.delete_mark(mark)
+        self.widget.configure(state='normal')
+        self.widget.insert(tk.END, text)
+        self.widget.see(tk.END)
+        self.widget.configure(state='disabled')
 
     def flush(self):
         pass
 
-class InputDialog(Gtk.Dialog):
+class InputDialog(simpledialog.Dialog):
     def __init__(self, parent, prompt):
-        super().__init__(title="Entrada necessária", transient_for=parent)
-        self.set_modal(True)
-        self.set_default_size(300, 100)
-
-        self.set_child(Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=6))
-
-        self.label = Gtk.Label(label=prompt)
-        self.entry = Gtk.Entry()
-        self.button = Gtk.Button(label="Confirmar")
-
-        self.get_child().append(self.label)
-        self.get_child().append(self.entry)
-        self.get_child().append(self.button)
-
-        self.button.connect("clicked", self.on_confirm)
-
+        self.prompt = prompt
         self.input_value = None
+        super().__init__(parent, title="Entrada necessária")
 
-    def on_confirm(self, button):
-        self.input_value = self.entry.get_text()
-        self.response(Gtk.ResponseType.OK)
+    def body(self, master):
+        master.configure(bg=DARK_BG)
+        label = tk.Label(master, text=self.prompt, bg=DARK_BG, fg=DARK_FG)
+        label.pack(padx=10, pady=5)
+        self.entry = tk.Entry(master, bg=DARK_ENTRY, fg=DARK_FG, insertbackground=DARK_FG)
+        self.entry.pack(padx=10, pady=5)
+        return self.entry
+
+    def apply(self):
+        self.input_value = self.entry.get()
 
     def get_input(self):
-        self.present()
-        self.wait_for_response()
         return self.input_value
 
-class MainWindow(Gtk.ApplicationWindow):
-    def __init__(self, app):
-        super().__init__(application=app)
-        self.set_title("Post Install Linux")
-        self.set_default_size(800, 600)
+class MainWindow(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title("Post Install Linux")
+        self.geometry("800x600")
+        self.configure(bg=DARK_BG)
 
-        self.set_child(Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10,
-                               margin_top=10, margin_bottom=10, margin_start=10, margin_end=10))
-        box = self.get_child()
+        # Switches (Checkbuttons)
+        self.full_install_var = tk.BooleanVar()
+        self.install_apps_var = tk.BooleanVar()
+        self.apply_theme_var = tk.BooleanVar()
+        self.config_terminal_var = tk.BooleanVar()
 
-        self.full_install = Gtk.Switch()
-        self.install_apps = Gtk.Switch()
-        self.apply_theme = Gtk.Switch()
-        self.config_terminal = Gtk.Switch()
+        options_frame = tk.Frame(self, bg=DARK_BG)
+        options_frame.pack(pady=10, padx=10, anchor='w')
 
-        box.append(self._row("Full Install", self.full_install))
-        box.append(self._row("Install Apps", self.install_apps))
-        box.append(self._row("Apply Theme", self.apply_theme))
-        box.append(self._row("Configure Terminal", self.config_terminal))
+        tk.Checkbutton(options_frame, text="Full Install", variable=self.full_install_var,
+                       bg=DARK_BG, fg=DARK_FG, selectcolor=DARK_ACCENT, activebackground=DARK_BG, activeforeground=DARK_FG).pack(anchor='w')
+        tk.Checkbutton(options_frame, text="Install Apps", variable=self.install_apps_var,
+                       bg=DARK_BG, fg=DARK_FG, selectcolor=DARK_ACCENT, activebackground=DARK_BG, activeforeground=DARK_FG).pack(anchor='w')
+        tk.Checkbutton(options_frame, text="Apply Theme", variable=self.apply_theme_var,
+                       bg=DARK_BG, fg=DARK_FG, selectcolor=DARK_ACCENT, activebackground=DARK_BG, activeforeground=DARK_FG).pack(anchor='w')
+        tk.Checkbutton(options_frame, text="Configure Terminal", variable=self.config_terminal_var,
+                       bg=DARK_BG, fg=DARK_FG, selectcolor=DARK_ACCENT, activebackground=DARK_BG, activeforeground=DARK_FG).pack(anchor='w')
 
-        self.output_view = Gtk.TextView()
-        self.output_buffer = self.output_view.get_buffer()
-        self.output_view.set_monospace(True)
-        self.output_view.set_wrap_mode(Gtk.WrapMode.WORD)
+        # Output area
+        self.output_view = scrolledtext.ScrolledText(self, wrap=tk.WORD, height=20, state='disabled', font=("Consolas", 10),
+                                                     bg=DARK_ACCENT, fg=DARK_FG, insertbackground=DARK_FG)
+        self.output_view.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
 
-        scrolled_window = Gtk.ScrolledWindow()
-        scrolled_window.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
-        scrolled_window.set_child(self.output_view)
-        scrolled_window.set_vexpand(True)
+        # Execute button
+        self.execute_button = tk.Button(self, text="Executar", command=self.on_execute,
+                                        bg=DARK_BTN, fg=DARK_FG, activebackground=DARK_BTN_ACTIVE, activeforeground=DARK_FG)
+        self.execute_button.pack(pady=10)
 
-        box.append(scrolled_window)
-
-        self.execute_button = Gtk.Button(label="Executar")
-        self.execute_button.connect("clicked", self.on_execute)
-        box.append(self.execute_button)
-
-        # Instancia controller passando output_buffer para manipular saída
-        self.controller = Controller(self.output_buffer)
+        # Instancia controller passando output_view para manipular saída
+        self.controller = Controller()
 
         # Redireciona print() e input()
-        sys.stdout = TextRedirector(self.output_buffer)
-        sys.stderr = TextRedirector(self.output_buffer)
+        sys.stdout = TextRedirector(self.output_view)
+        sys.stderr = TextRedirector(self.output_view)
         builtins.input = self.custom_input
 
-    def _row(self, label_text, widget):
-        row = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        row.append(Gtk.Label(label=label_text))
-        row.append(widget)
-        return row
+        # Armazena a senha sudo só em memória
+        self.sudo_password = None
 
     def custom_input(self, prompt):
         dialog = InputDialog(self, prompt)
         response = dialog.get_input()
-        self.output_buffer.insert(self.output_buffer.get_end_iter(), f"{prompt}{response}\n")
+        self.output_view.configure(state='normal')
+        self.output_view.insert(tk.END, f"{prompt}{response}\n")
+        self.output_view.see(tk.END)
+        self.output_view.configure(state='disabled')
         return response
 
-    def on_execute(self, button):
-        self.output_buffer.set_text("")
+    def ask_sudo_password(self):
+        if self.sudo_password is None:
+            self.sudo_password = simpledialog.askstring("Senha sudo", "Digite sua senha sudo:", show='*', parent=self)
+        return self.sudo_password
+
+    def run_sudo_command(self, command):
+        password = self.ask_sudo_password()
+        if not password:
+            print("Operação cancelada pelo usuário.")
+            return
+        proc = subprocess.Popen(
+            f"echo {password} | sudo -S {command}",
+            shell=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            text=True
+        )
+        for line in proc.stdout:
+            print(line, end='')
+        proc.wait()
+
+    def on_execute(self):
+        self.output_view.configure(state='normal')
+        self.output_view.delete(1.0, tk.END)
+        self.output_view.configure(state='disabled')
         thread = threading.Thread(target=self.run_tasks)
         thread.start()
 
     def run_tasks(self):
-        if self.full_install.get_active():
-            print("[+] Executando instalação completa...")
-            self.controller.install_full()
+        # Pede a senha sudo uma vez, se necessário
+        if any([self.full_install_var.get(), self.install_apps_var.get(), self.apply_theme_var.get(), self.config_terminal_var.get()]):
+            self.ask_sudo_password()
 
-        if self.install_apps.get_active():
+        if self.full_install_var.get():
+            print("[+] Executando instalação completa...")
+            # Exemplo: self.run_sudo_command("apt update && apt upgrade -y")
+            self.controller.install_full()  # Adapte seu controller para receber a senha se necessário
+
+        if self.install_apps_var.get():
             print("[+] Instalando apps...")
             self.controller.install_packages()
 
-        if self.apply_theme.get_active():
+        if self.apply_theme_var.get():
             print("[+] Aplicando tema GTK...")
             self.controller.install_gtk_theme()
 
-        if self.config_terminal.get_active():
+        if self.config_terminal_var.get():
             print("[+] Configurando terminal...")
             self.controller.install_oh_my_bash()
 
         print("\n[✓] Concluído.")
 
-class App(Gtk.Application):
-    def __init__(self):
-        super().__init__(application_id="com.ruan.PostInstall")
-
-    def do_activate(self):
-        win = MainWindow(self)
-        win.present()
+        # Limpa a senha da memória ao final
+        self.sudo_password = None
 
 def start_gui():
-    app = App()
-    app.run()
+    app = MainWindow()
+    app.mainloop()
 
 if __name__ == "__main__":
     start_gui()
