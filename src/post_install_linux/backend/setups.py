@@ -9,7 +9,7 @@ from pathlib import Path
 
 from src.post_install_linux.backend.utils.utils import get_data, check_connection, detect_battery
 from src.post_install_linux.backend.utils.system import remove_trava
-from src.post_install_linux.env import TEMP_DIR, DISTRO, ZIP_DIR
+from src.post_install_linux.env import TEMP_DIR, DISTRO, ZIP_DIR, SO
 
 
 def setup_yay():
@@ -308,8 +308,15 @@ def configs_keyboard():
     SHORTCUTS = [
         "firefox;firefox;<Super>b",
         "files;nautilus;<Super>e",
-        "terminal;kgx;<Super>t",
+        "code;code;<Super>c",
     ]
+
+    match SO:
+        case "arch":
+            SHORTCUTS.append("terminal;kgx;<Super>Return")
+        case "fedora" | "debian":
+            SHORTCUTS.append("terminal;gnome-terminal;<Super>Return")
+
 
     # Limpa atalhos antigos
     subprocess.run(["gsettings", "set", "org.gnome.settings-daemon.plugins.media-keys", "custom-keybindings", "[]"])

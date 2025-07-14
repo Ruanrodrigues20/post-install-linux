@@ -37,6 +37,18 @@ def get_distro():
     return type_distro
 
 
+def _get_so():
+    """
+    return this system's shared object extension
+    """
+    SOs = ['fedora', 'debian', 'arch', 'ubuntu', 'linuxmint', 'pop!_os']
+    so = _get_distro().lower()
+
+    for s in SOs:
+        if s in so:
+            return s
+    return so
+
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, '../../data')
@@ -44,3 +56,7 @@ TEMP_DIR = os.path.join(DATA_DIR, 'temp')
 JSON_DIR = os.path.join(DATA_DIR, 'json')
 ZIP_DIR = os.path.join(DATA_DIR, 'zip')
 DISTRO = get_distro()
+SO = _get_so()
+
+print(SO)
+

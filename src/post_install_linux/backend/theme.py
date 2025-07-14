@@ -45,7 +45,6 @@ def install_wallpapers():
 
     run_cmd(["rm", "-rf","'wallpapers'"], cwd=TEMP_DIR) 
 
-
     
 def clone_repositories():
     print("\033[1;34m===== 🔥 Cloning Repositories =====\033[0m")
@@ -61,6 +60,7 @@ def clone_repositories():
             run_cmd(["git", "clone", rep])
 
     os.chdir(os.path.dirname(TEMP_DIR))  # volta para a pasta anterior
+
 
 def install_gtk_theme():
     path = os.path.join(TEMP_DIR, "WhiteSur-gtk-theme")
@@ -82,11 +82,13 @@ def install_gtk_theme():
     run_cmd(["sudo", "flatpak", "override", "--filesystem=xdg-config/gtk-3.0"])
     run_cmd(["sudo", "flatpak", "override", "--filesystem=xdg-config/gtk-4.0"])
 
+
 def install_themes_icons():
     path = os.path.join(TEMP_DIR, "WhiteSur-icon-theme")
     if os.path.isdir(path):
         print("🎨 Installing WhiteSur icon theme...")
         run_cmd(["sudo", "./install.sh", "-t", "all"], cwd=path)
+
 
 def install_theme_cursors():
     path = os.path.join(TEMP_DIR, "WhiteSur-cursors")
@@ -104,6 +106,7 @@ def install_w_themes():
         print("❌ Directory 'WhiteSur-wallpapers' not found.")
         sys.exit(1)
 
+
 def apply_configs_themes():
     print("\033[1;34m===== 🔥 Applying themes =====\033[0m")
 
@@ -118,10 +121,10 @@ def apply_configs_themes():
         else:
             print(f"❌ Failed to apply {key.replace('-', ' ')}.")
 
-    gsettings_set("org.gnome.desktop.interface", "gtk-theme", "'WhiteSur-Dark-blue'")
-    gsettings_set("org.gnome.desktop.interface", "icon-theme", "'WhiteSur-dark'")
+    gsettings_set("org.gnome.desktop.interface", "gtk-theme", "'WhiteSur-Dark-purple'")
+    gsettings_set("org.gnome.desktop.interface", "icon-theme", "'WhiteSur-purple-dark'")
     gsettings_set("org.gnome.desktop.interface", "cursor-theme", "'WhiteSur-cursors'")
-    gsettings_set("org.gnome.desktop.interface", "accent-color", "'blue'")
+    gsettings_set("org.gnome.desktop.interface", "accent-color", "'purple'")
     gsettings_set("org.gnome.desktop.wm.preferences", "button-layout", "'close,minimize,maximize:'")
     gsettings_set("org.gnome.desktop.background", "picture-uri", f"'{background_path}'")
     gsettings_set("org.gnome.desktop.background", "picture-uri-dark", f"'{background_path}'")
