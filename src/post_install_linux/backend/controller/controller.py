@@ -1,7 +1,7 @@
 import src.post_install_linux.backend.utils.utils as utils
 import post_install_linux.backend.services.setups as setups
 import post_install_linux.backend.services.install_packages as inp
-import post_install_linux.backend.utils.theme as theme    
+import post_install_linux.backend.services.theme as theme    
 from post_install_linux.backend.env import TEMP_DIR, DISTRO, DATA_DIR, JSON_DIR, ZIP_DIR
 
 class Controller():
