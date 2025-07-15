@@ -269,8 +269,8 @@ def configs():
 
 
 
-def set_profile_picture_current_user(distro):
-    if distro != "debian":
+def set_profile_picture_current_user():
+    if DISTRO != "debian":
         return
 
     user = os.getenv("USER")
