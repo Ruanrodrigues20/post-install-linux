@@ -1,5 +1,5 @@
 import subprocess
-from src.post_install_linux.env import DISTRO
+from post_install_linux.backend.env import DISTRO
 
 def is_gnome() -> bool:
     """

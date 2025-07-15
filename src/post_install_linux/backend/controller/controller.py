@@ -1,8 +1,8 @@
 import src.post_install_linux.backend.utils.utils as utils
-import post_install_linux.backend.setups as setups
-import src.post_install_linux.backend.install_packages as inp
-import src.post_install_linux.backend.theme as theme    
-from src.post_install_linux.env import TEMP_DIR, DISTRO, DATA_DIR, JSON_DIR, ZIP_DIR
+import post_install_linux.backend.services.setups as setups
+import post_install_linux.backend.services.install_packages as inp
+import post_install_linux.backend.utils.theme as theme    
+from post_install_linux.backend.env import TEMP_DIR, DISTRO, DATA_DIR, JSON_DIR, ZIP_DIR
 
 class Controller():
 
@@ -13,6 +13,9 @@ class Controller():
     def setup_yay(self):
         setups.setup_yay()
 
+
+    def test(self):
+        setups.configs_keyboard()
 
     def install_wallpapers(self):
         theme.install_wallpapers()
@@ -153,3 +156,6 @@ class Controller():
         self.install_oh_my_bash()
 
         utils.ask_to_restart()
+
+    def get_apps(self):
+        return utils.get_data(DISTRO, "apps")

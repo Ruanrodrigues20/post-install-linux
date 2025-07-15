@@ -2,8 +2,8 @@ import os
 import subprocess
 import sys
 from src.post_install_linux.backend.utils.utils import get_data
-from src.post_install_linux.backend.utils.system import is_gnome
-from src.post_install_linux.env import TEMP_DIR, DISTRO
+from post_install_linux.backend.utils.system import is_gnome
+from post_install_linux.backend.env import TEMP_DIR, DISTRO
 
 
 

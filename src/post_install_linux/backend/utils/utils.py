@@ -2,7 +2,17 @@ import subprocess
 import sys
 import os
 import json
-from src.post_install_linux.env import JSON_DIR, DISTRO
+from post_install_linux.backend.env import JSON_DIR, DISTRO
+
+
+def run_cmd(cmd, cwd=None, sudo=False, check=False, capture_output=False):
+    if sudo:
+        cmd = ["sudo"] + cmd
+    result = subprocess.run(cmd, cwd=cwd)
+    if result.returncode != 0:
+        print(f"❌ Command failed: {' '.join(cmd)}", file=sys.stderr)
+        sys.exit(1)
+    return result
 
 
 def get_data(distro: str, categoria: str) -> list[str]:
@@ -68,4 +78,5 @@ def detect_battery() -> bool:
         os.path.isdir("/sys/class/power_supply/BAT0") or
         os.path.isdir("/sys/class/power_supply/BAT1")
     )
+
 

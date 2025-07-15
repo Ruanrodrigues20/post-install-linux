@@ -4,12 +4,13 @@ import shutil
 import zipfile
 import tempfile
 import urllib.request
+import src.post_install_linux.backend.utils.utils as utils
 
 from pathlib import Path
 
 from src.post_install_linux.backend.utils.utils import get_data, check_connection, detect_battery
-from src.post_install_linux.backend.utils.system import remove_trava
-from src.post_install_linux.env import TEMP_DIR, DISTRO, ZIP_DIR, SO
+from post_install_linux.backend.utils.system import remove_trava
+from post_install_linux.backend.env import TEMP_DIR, DISTRO, ZIP_DIR, SO
 
 
 def setup_yay():
@@ -199,7 +200,7 @@ def setup_bt_service():
         )
 
         # Recarrega o daemon e habilita o serviço
-        subprocess.run(["sudo", "systemctl", "daemon-reexec"], check=True)
+        utils.run_cmd(["sudo", "systemctl", "daemon-reexec"], check=True)
         subprocess.run(["sudo", "systemctl", "enable", "rfkill-bluetooth.service"], check=True)
 
 
@@ -225,7 +226,7 @@ def set_configs_fastfetch():
 
     # Move pasta .config/fastfetch para ~/.config/
     if Path(".config/fastfetch").exists():
-        shutil.move(".config/fastfetch", str(fastfetch_dir))
+        utils.run_cmd(["mv", f"{str(fastfetch_dir)}",".config/fastfetch"])
         print("✅ fastfetch config installed.")
     else:
         print("❌ fastfetch config not found after unzip.")
@@ -264,7 +265,7 @@ def configs():
     ]
 
     for cmd in cmds:
-        subprocess.run(cmd, check=False)
+        utils.run_cmd(cmd)
 
 
 
@@ -283,22 +284,19 @@ def set_profile_picture_current_user(distro):
         return 1
 
     # Converter SVG para PNG (precisa ter imagem convertida)
-    result = subprocess.run(["convert", str(svg_path), str(png_path)])
+    result = utils.run_cmd(["convert", str(svg_path), str(png_path)])
     if result.returncode != 0:
         return 1
 
     try:
-        subprocess.run(["sudo", "cp", str(png_path), str(icon_path)], check=True)
+        utils.run_cmd(["cp", str(png_path), str(icon_path)], sudo=True)
     except subprocess.CalledProcessError:
         return 1
 
     conf_content = f"[User]\nIcon={icon_path}\n"
-    subprocess.run(
-        ["sudo", "bash", "-c", f"echo '{conf_content}' > '{user_conf_path}'"], check=True
-    )
-
-    subprocess.run(["sudo", "chmod", "644", str(icon_path)])
-    subprocess.run(["sudo", "chown", "root:root", str(icon_path)])
+    utils.run_cmd(["bash", "-c", f"echo '{conf_content}' > '{user_conf_path}'"], sudo=True)
+    utils.run_cmd(["chmod", "644", str(icon_path)], sudo=True)
+    utils.run_cmd(["chown", "root:root", str(icon_path)], sudo=True)
 
 
 
@@ -319,7 +317,7 @@ def configs_keyboard():
 
 
     # Limpa atalhos antigos
-    subprocess.run(["gsettings", "set", "org.gnome.settings-daemon.plugins.media-keys", "custom-keybindings", "[]"])
+    utils.run_cmd(["gsettings", "set", "org.gnome.settings-daemon.plugins.media-keys", "custom-keybindings", "[]"])
 
     PATHS = []
 
@@ -328,19 +326,19 @@ def configs_keyboard():
         key_path = f"{BASE_PATH}/custom{i}/"
         PATHS.append(f'"{key_path}"')
 
-        subprocess.run(["gsettings", "set", f"org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:{key_path}", "name", name])
-        subprocess.run(["gsettings", "set", f"org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:{key_path}", "command", command])
-        subprocess.run(["gsettings", "set", f"org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:{key_path}", "binding", binding])
+        utils.run_cmd(["gsettings", "set", f"org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:{key_path}", "name", name])
+        utils.run_cmd(["gsettings", "set", f"org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:{key_path}", "command", command])
+        utils.run_cmd(["gsettings", "set", f"org.gnome.settings-daemon.plugins.media-keys.custom-keybinding:{key_path}", "binding", binding])
 
     joined = ",".join(PATHS)
-    subprocess.run(["gsettings", "set", "org.gnome.settings-daemon.plugins.media-keys", "custom-keybindings", f"[{joined}]"])
+    utils.run_cmd(["gsettings", "set", "org.gnome.settings-daemon.plugins.media-keys", "custom-keybindings", f"[{joined}]"])
 
     LEFT_SHORTCUT = "<Control><Super>Left"
     RIGHT_SHORTCUT = "<Control><Super>Right"
     CLOSE_SHORTCUT = "<Super>q"
     MINIMIZE_SHORTCUT = "<Super>d"
 
-    subprocess.run(["gsettings", "set", "org.gnome.desktop.wm.keybindings", "move-to-workspace-left", f"['{LEFT_SHORTCUT}']"])
-    subprocess.run(["gsettings", "set", "org.gnome.desktop.wm.keybindings", "move-to-workspace-right", f"['{RIGHT_SHORTCUT}']"])
-    subprocess.run(["gsettings", "set", "org.gnome.desktop.wm.keybindings", "close", f"['{CLOSE_SHORTCUT}']"])
-    subprocess.run(["gsettings", "set", "org.gnome.desktop.wm.keybindings", "minimize", f"['{MINIMIZE_SHORTCUT}']"])
+    utils.run_cmd(["gsettings", "set", "org.gnome.desktop.wm.keybindings", "move-to-workspace-left", f"['{LEFT_SHORTCUT}']"])
+    utils.run_cmd(["gsettings", "set", "org.gnome.desktop.wm.keybindings", "move-to-workspace-right", f"['{RIGHT_SHORTCUT}']"])
+    utils.run_cmd(["gsettings", "set", "org.gnome.desktop.wm.keybindings", "close", f"['{CLOSE_SHORTCUT}']"])
+    utils.run_cmd(["gsettings", "set", "org.gnome.desktop.wm.keybindings", "minimize", f"['{MINIMIZE_SHORTCUT}']"])
