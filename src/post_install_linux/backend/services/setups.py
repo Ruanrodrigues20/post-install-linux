@@ -10,7 +10,7 @@ from pathlib import Path
 
 from src.post_install_linux.backend.utils.utils import get_data, check_connection, detect_battery
 from post_install_linux.backend.utils.system import remove_trava
-from post_install_linux.backend.env import TEMP_DIR, DISTRO, ZIP_DIR, SO
+from post_install_linux.backend.env import TEMP_DIR, DISTRO, ZIP_DIR, SO, PASSWORD
 
 
 def setup_yay():
@@ -20,17 +20,17 @@ def setup_yay():
         return
 
     print("\033[1;34m===== 🔥 Installing YAY =====\033[0m")
-    subprocess.run(["sudo", "pacman", "-S", "--noconfirm", "--needed", "base-devel", "git"])
+    utils.run_cmd(["pacman", "-S", "--noconfirm", "--needed", "base-devel", "git"], sudo=True, password=PASSWORD)
     os.makedirs(TEMP_DIR, exist_ok=True)
 
     yay_path = os.path.join(TEMP_DIR, "yay")
     if os.path.exists(yay_path):
         shutil.rmtree(yay_path)
 
-    subprocess.run(["git", "clone", "https://aur.archlinux.org/yay.git", yay_path])
-    subprocess.run(["makepkg", "-si", "--noconfirm"], cwd=yay_path)
-    subprocess.run(["yay", "-Sy", "--aur", "--devel", "--timeupdate"])
-    subprocess.run(["yay", "-Syu"])
+    utils.run_cmd(["git", "clone", "https://aur.archlinux.org/yay.git"],cwd=yay_path)
+    utils.run_cmd(["makepkg", "-si", "--noconfirm"], cwd=yay_path)
+    utils.run_cmd(["yay", "-Sy", "--aur", "--devel", "--timeupdate"], sudo=True, password=PASSWORD)
+    utils.run_cmd(["yay", "-Syu"], sudo=True, password=PASSWORD)
     shutil.rmtree(yay_path, ignore_errors=True)
 
 def install_theme_grub():

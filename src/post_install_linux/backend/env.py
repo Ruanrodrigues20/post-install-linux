@@ -1,5 +1,6 @@
 import os
 import subprocess
+import getpass
 
 def _get_distro():
     """
@@ -41,7 +42,8 @@ def _get_so():
     """
     return this system's shared object extension
     """
-    SOs = ['fedora', 'debian', 'arch', 'ubuntu', 'linuxmint', 'pop!_os']
+    SOs = ["fedora", "debian", "arch", "ubuntu", "linuxmint", "pop!_os",
+            "cachyOs", "zorin"]
     so = _get_distro().lower()
 
     for s in SOs:
@@ -51,12 +53,10 @@ def _get_so():
 
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-DATA_DIR = os.path.join(BASE_DIR, '../../data')
+DATA_DIR = os.path.abspath(os.path.join(BASE_DIR, '../../../data'))
 TEMP_DIR = os.path.join(DATA_DIR, 'temp')
 JSON_DIR = os.path.join(DATA_DIR, 'json')
 ZIP_DIR = os.path.join(DATA_DIR, 'zip')
 DISTRO = get_distro()
 SO = _get_so()
-
-print(SO)
-
+PASSWORD = getpass.getpass("Enter your password: ")

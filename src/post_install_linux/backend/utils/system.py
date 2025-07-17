@@ -1,5 +1,6 @@
 import subprocess
-from post_install_linux.backend.env import DISTRO
+from post_install_linux.backend.env import DISTRO, PASSWORD
+import src.post_install_linux.backend.utils.utils as utils
 
 def is_gnome() -> bool:
     """
@@ -31,23 +32,23 @@ def remove_trava():
             "/var/lib/apt/lists/lock"
         ]
         for lock in locks:
-            subprocess.run(["sudo", "rm", "-f", lock])
-        subprocess.run(["sudo", "dpkg", "--configure", "-a"])
+            utils.run_cmd(["rm", "-f", lock], sudo=True, password=PASSWORD)
+        utils.run_cmd(["dpkg", "--configure", "-a"], sudo=True, password=PASSWORD)
 
 
 def update_system():
     print("\033[1;34m===== 🔥 Updating System =====\033[0m")
 
     if DISTRO == "debian":
-        remove_trava()
-        subprocess.run(["sudo", "apt", "update"])
-        subprocess.run(["sudo", "apt", "upgrade", "-y"])
-        subprocess.run(["sudo", "apt", "autoremove", "-y"])
-        subprocess.run(["sudo", "apt", "clean"])
+        utils.run_cmd(["dpkg", "--configure", "-a"], sudo=True, password=PASSWORD)
+        utils.run_cmd(["apt", "update"], sudo=True, password=PASSWORD)
+        utils.run_cmd(["apt", "upgrade", "-y"], sudo=True, password=PASSWORD)
+        utils.run_cmd(["apt", "autoremove", "-y"], sudo=True, password=PASSWORD)
+        utils.run_cmd(["apt", "clean"], sudo=True, password=PASSWORD)
     elif DISTRO == "arch":
-        subprocess.run(["yay", "-Syu", "--noconfirm"])
+        utils.run_cmd(["yay", "-Syu", "--noconfirm"], sudo=True, password=PASSWORD)
     elif DISTRO == "fedora":
-        subprocess.run(["sudo", "dnf", "upgrade", "--refresh", "-y"])
+        utils.run_cmd(["dnf", "upgrade", "--refresh", "-y"], sudo=True, password=PASSWORD)
 
 
 def install(type: str, packages: list[str]):
@@ -72,24 +73,24 @@ def _install_pkg(pkg: str):
         distro (str): 'arch', 'debian', 'fedora', etc.
     """
     if DISTRO == "arch":
-        result = subprocess.run(["pacman", "-Qi", pkg], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        result = utils.run_cmd(["pacman", "-Qi", pkg], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         if result.returncode != 0:
-            subprocess.run(["yay", "-S", "--noconfirm", pkg])
+            utils.run_cmd(["yay", "-S", "--noconfirm", pkg], password=PASSWORD, sudo=True)
         else:
             print(f"\033[1;32m✔️  {pkg} is already installed.\033[0m")
 
     elif DISTRO == "debian":
         remove_trava()
-        result = subprocess.run(["dpkg", "-s", pkg], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        result = utils.run_cmd(["dpkg", "-s", pkg], sudo=True, password=PASSWORD, stdout=subprocess.DEVNULL)
         if result.returncode != 0:
-            subprocess.run(["sudo", "apt", "install", "-y", pkg])
+            utils.run_cmd(["apt", "install", "-y", pkg], sudo=True, password=PASSWORD)
         else:
             print(f"\033[1;32m✔️  {pkg} is already installed.\033[0m")
 
     elif DISTRO == "fedora":
-        result = subprocess.run(["rpm", "-q", pkg], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        result = utils.run_cmd(["rpm", "-q", pkg], sudo=True, password=PASSWORD)
         if result.returncode != 0:
-            subprocess.run(["sudo", "dnf", "install", "-y", pkg])
+            utils.run_cmd([ "dnf", "install", "-y",pkg], sudo=True, password=PASSWORD)
         else:
             print(f"\033[1;32m✔️  {pkg} is already installed.\033[0m")
 
@@ -102,14 +103,14 @@ def _install_pkg(pkg: str):
 def _install_flatpaks(apps: list[str]):
     for app in apps:
         print(f"\033[1;33mInstalling {app} via Flatpak...\033[0m")
-        subprocess.run(["flatpak", "install", "-y", "flathub", app])
+        utils.run_cmd(["flatpak", "install", "-y", "flathub", app])
 
 
 def _install_snaps(snaps: list[str]):
     for snap in snaps:
-        result = subprocess.run(["snap", "list", snap], stdout=subprocess.DEVNULL)
+        result = utils.run_cmd(["snap", "list", snap])
         if result.returncode == 0:
             print(f"✅ {snap} is already installed. Skipping...")
         else:
             print(f"🔹 Installing: {snap}")
-            subprocess.run(["sudo", "snap", "install", snap, "--classic"])
+            utils.run_cmd(["snap", "install", snap, "--classic"], sudo=True, password=PASSWORD)
