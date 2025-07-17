@@ -2,7 +2,7 @@ import subprocess
 import sys
 import os
 import json
-from post_install_linux.backend.env import JSON_DIR, DISTRO
+from src.post_install_linux.backend.env import JSON_DIR, DISTRO
 
 
 def run_cmd(cmd, cwd=None, sudo=False, check=False, capture_output=False):
@@ -13,44 +13,45 @@ def run_cmd(cmd, cwd=None, sudo=False, check=False, capture_output=False):
         print(f"❌ Command failed: {' '.join(cmd)}", file=sys.stderr)
         sys.exit(1)
     return result
-def run_cmd(cmd, cwd=None, sudo=False, check=False, capture_output=False, password=None):
+def run_cmd(cmd, cwd=None, sudo=False, check=False, capture_output=False, password=None, input=None):
     if sudo:
         if password is None:
-            raise ValueError("⚠️ Você deve fornecer a senha quando sudo=True.")
+            raise ValueError("⚠️ You must provide the password when sudo=True.")
         full_cmd = ['sudo', '-S'] + cmd
     else:
         full_cmd = cmd
 
     try:
         if capture_output:
-            # Usa subprocess.run para capturar output e returncode
             result = subprocess.run(
                 full_cmd,
                 cwd=cwd,
-                input=(password + '\n') if sudo else None,
+                input=(password + '\n' + input) if sudo and input else (password + '\n') if sudo else input,
                 text=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 check=check
             )
-            return result  # CompletedProcess, tem returncode, stdout, stderr
+            return result
         else:
-            # Usa Popen para output direto no terminal
             proc = subprocess.Popen(
                 full_cmd,
                 cwd=cwd,
-                stdin=subprocess.PIPE if sudo else None,
+                stdin=subprocess.PIPE if sudo or input else None,
                 stdout=sys.stdout,
                 stderr=sys.stderr,
                 text=True
             )
             if sudo:
                 proc.stdin.write(password + '\n')
+            if input:
+                proc.stdin.write(input)
+            if proc.stdin:
                 proc.stdin.flush()
             proc.wait()
             if check and proc.returncode != 0:
                 raise subprocess.CalledProcessError(proc.returncode, cmd)
-            return proc  # Popen, tem returncode
+            return proc
     except Exception as e:
         print(f"❌ Command failed: {' '.join(cmd)}", file=sys.stderr)
         print(f"Detalhe: {e}", file=sys.stderr)

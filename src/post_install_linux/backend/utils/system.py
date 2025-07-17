@@ -1,6 +1,6 @@
-import subprocess
-from post_install_linux.backend.env import DISTRO, PASSWORD
+from src.post_install_linux.backend.env import DISTRO, PASSWORD
 import src.post_install_linux.backend.utils.utils as utils
+
 
 def is_gnome() -> bool:
     """
@@ -11,16 +11,15 @@ def is_gnome() -> bool:
         bool: True se GNOME estiver instalado, False caso contrário.
     """
     try:
-        subprocess.run(
+        result = utils.run_cmd(
             ["gnome-shell", "--version"],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            check=True
+            check=True,
+            capture_output=True
         )
-        return True
-    except (subprocess.CalledProcessError, FileNotFoundError):
+        return result.returncode == 0
+    except Exception:
         return False
-    
+
 
 def remove_trava():
     if DISTRO == "debian":
@@ -32,7 +31,7 @@ def remove_trava():
             "/var/lib/apt/lists/lock"
         ]
         for lock in locks:
-            utils.run_cmd(["rm", "-f", lock], sudo=True, password=PASSWORD)
+            utils.run_cmd(["rm", "-rf", lock], sudo=True, password=PASSWORD)
         utils.run_cmd(["dpkg", "--configure", "-a"], sudo=True, password=PASSWORD)
 
 
@@ -73,7 +72,7 @@ def _install_pkg(pkg: str):
         distro (str): 'arch', 'debian', 'fedora', etc.
     """
     if DISTRO == "arch":
-        result = utils.run_cmd(["pacman", "-Qi", pkg], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        result = utils.run_cmd(["pacman", "-Qi", pkg])
         if result.returncode != 0:
             utils.run_cmd(["yay", "-S", "--noconfirm", pkg], password=PASSWORD, sudo=True)
         else:
@@ -81,7 +80,7 @@ def _install_pkg(pkg: str):
 
     elif DISTRO == "debian":
         remove_trava()
-        result = utils.run_cmd(["dpkg", "-s", pkg], sudo=True, password=PASSWORD, stdout=subprocess.DEVNULL)
+        result = utils.run_cmd(["dpkg", "-s", pkg], sudo=True, password=PASSWORD)
         if result.returncode != 0:
             utils.run_cmd(["apt", "install", "-y", pkg], sudo=True, password=PASSWORD)
         else:

@@ -3,10 +3,10 @@ import tempfile
 import urllib.request
 import zipfile
 import glob
-import subprocess
 from post_install_linux.backend.utils.system import install, is_gnome
 from src.post_install_linux.backend.utils.utils import get_data
-from post_install_linux.backend.env import TEMP_DIR, DISTRO
+from src.post_install_linux.backend.env import TEMP_DIR, DISTRO, PASSWORD
+import src.post_install_linux.backend.utils.utils as utils
 
 
 
@@ -90,7 +90,7 @@ def install_fonts():
             zip_ref.extractall(font_dir)
 
         # Atualiza cache de fontes
-        subprocess.run(["fc-cache", "-f", font_dir], check=True)
+        utils.run_cmd(["fc-cache", "-f", font_dir], check=True)
 
     finally:
         # Remove diretório temporário
@@ -104,7 +104,7 @@ def snaps_install():
         print("\033[1;34m===== 🔥 Installing Snaps =====\033[0m")
 
         if DISTRO == "fedora" and not os.path.exists("/snap"):
-            subprocess.run(["sudo", "ln", "-s", "/var/lib/snapd/snap", "/snap"], check=False)
+            utils.run_cmd(["ln", "-s", "/var/lib/snapd/snap", "/snap"], check=False, sudo=True, password=PASSWORD)
 
         snaps = get_data("common", "snaps")
         if snaps:
@@ -115,10 +115,8 @@ def install_flatpaks():
     print()
 
     # Adiciona o repositório flathub
-    subprocess.run([
-        "flatpak", "remote-add", "--if-not-exists",
-        "flathub", "https://dl.flathub.org/repo/flathub.flatpakrepo"
-    ], check=True)
+    utils.run_cmd(["flatpak", "remote-add", "--if-not-exists"], check=True, sudo=True, password=PASSWORD)
+    utils.run_cmd(["flathub", "https://dl.flathub.org/repo/flathub.flatpakrepo"], check=True, sudo=True, password=PASSWORD)
 
     flatpaks = get_data("common", "flatpaks")
     if flatpaks:
@@ -183,12 +181,12 @@ def intellij_install():
     repo_url = "https://github.com/Ruanrodrigues20/intelliJ-install"
 
     if not os.path.isdir("intelliJ-install"):
-        subprocess.run(["git", "clone", repo_url], check=True)
+        utils.run_cmd(["git", "clone", repo_url], check=True)
     else:
         print("📁 IntelliJ repo already cloned. Skipping.")
 
     install_path = os.path.join(TEMP_DIR, "intelliJ-install", "install.sh")
-    subprocess.run(["bash", install_path], check=True)
+    utils.run_cmd(["bash", install_path], check=True)
 
 def install_docker_fedora():
     print("📦 Installing Docker on Fedora...")
@@ -205,11 +203,7 @@ def install_docker_fedora():
     gpgkey=https://download.docker.com/linux/fedora/gpg
     """
     repo_path = "/etc/yum.repos.d/docker-ce.repo"
-    try:
-        subprocess.run(["sudo", "tee", repo_path], input=docker_repo.encode(), check=True)
-    except subprocess.CalledProcessError:
-        print("❌ Failed to add Docker repository.")
-        return
+    utils.run_cmd(["tee", repo_path],sudo=True, password=PASSWORD, input=docker_repo.encode(), check=True)
 
     print("⬇️ Installing Docker and components...")
     apps = [
@@ -222,13 +216,13 @@ def install_docker_fedora():
     install("pkg", apps)
 
     print("👤 Adding current user to docker group...")
-    subprocess.run(["sudo", "usermod", "-aG", "docker", os.getlogin()], check=False)
+    utils.run_cmd(["usermod", "-aG", "docker", os.getlogin()], sudo=True, password=PASSWORD,check=False)
 
     print("🚀 Enabling and starting Docker...")
-    subprocess.run(["sudo", "systemctl", "enable", "--now", "docker"], check=True)
+    utils.run_cmd(["systemctl", "enable", "--now", "docker"], sudo=True, password=PASSWORD,check=True)
 
     print("🧪 Testing Docker with hello-world...")
-    subprocess.run(["sudo", "docker", "run", "hello-world"], check=False)
+    utils.run_cmd(["docker", "run", "hello-world"], sudo=True, password=PASSWORD, check=False)
 
     print("✅ Docker installed successfully!")
 

@@ -1,9 +1,5 @@
 import os
-import subprocess
 import shutil
-import zipfile
-import tempfile
-import urllib.request
 import src.post_install_linux.backend.utils.utils as utils
 
 from pathlib import Path
@@ -33,27 +29,42 @@ def setup_yay():
     utils.run_cmd(["yay", "-Syu"], sudo=True, password=PASSWORD)
     shutil.rmtree(yay_path, ignore_errors=True)
 
+
 def install_theme_grub():
-    try:
-        subprocess.run(["grub-install", "--version"], check=True, stdout=subprocess.DEVNULL)
-    except subprocess.CalledProcessError:
+    result = utils.run_cmd(
+        ["grub-install", "--version"],
+        check=False,
+        capture_output=True
+    )
+    if result.returncode != 0:
         return
 
     print("\033[1;34m===== 🔥 Installing Theme Grub =====\033[0m")
+
     grub_path = "/boot/grub/themes"
     os.makedirs(grub_path, exist_ok=True)
 
-    with subprocess.Popen(["sudo", "bash"], stdin=subprocess.PIPE) as proc:
-        proc.stdin.write(b"""
-        cd /boot/grub/themes || exit 1
+    script = """
+        set -e
+        cd /boot/grub/themes
         [ ! -d grub2-themes ] && git clone https://github.com/vinceliuice/grub2-themes.git
-        cd grub2-themes || exit 1
+        cd grub2-themes
         ./install.sh -t whitesur -i whitesur
-        """)
-        if DISTRO == "fedora":
-            proc.stdin.write(b"grub2-mkconfig -o /boot/grub2/grub.cfg\n")
-        else:
-            proc.stdin.write(b"update-grub\n")
+        """
+
+    if DISTRO == "fedora":
+        script += "grub2-mkconfig -o /boot/grub2/grub.cfg\n"
+    else:
+        script += "update-grub\n"
+
+    utils.run_cmd(
+        ["bash"],
+        sudo=True,
+        password=PASSWORD,
+        input=script,
+        check=True
+    )
+
 
 def install_oh_my_bash():
     print("\033[1;34m===== 🔥 Installing Oh My Bash =====\033[0m")
@@ -64,7 +75,7 @@ def install_oh_my_bash():
         print("Oh My Bash is already installed. Skipping...")
         return
 
-    subprocess.run(["git", "clone", "--depth=1", "https://github.com/ohmybash/oh-my-bash.git", oh_my_bash_dir])
+    utils.run_cmd(["git", "clone", "--depth=1", "https://github.com/ohmybash/oh-my-bash.git"], cwd=oh_my_bash_dir)
     bashrc_template = os.path.join(oh_my_bash_dir, "templates/bashrc.osh-template")
     bashrc = os.path.join(home, ".bashrc")
     shutil.copy(bashrc_template, bashrc)
@@ -90,39 +101,57 @@ def git_config():
 
     name = input("Enter your user name: ")
     email = input("Enter your email: ")
-    subprocess.run(["git", "config", "--global", "user.name", name])
-    subprocess.run(["git", "config", "--global", "user.email", email])
+    utils.run_cmd(["git", "config", "--global", "user.name", name])
+    utils.run_cmd(["git", "config", "--global", "user.email", email])
     print("Git config set successfully.")
 
     ssh_choice = input("Do you want to generate a new SSH key for Git? (y/n): ")
     if ssh_choice.lower() == "y":
         key_path = os.path.expanduser("~/.ssh/id_ed25519")
         if not os.path.isfile(key_path):
-            subprocess.run(["ssh-keygen", "-t", "ed25519", "-C", email, "-f", key_path, "-N", ""])
-            subprocess.run(["eval", "$(ssh-agent -s)"], shell=True)
-            subprocess.run(["ssh-add", key_path])
+            utils.run_cmd(["ssh-keygen", "-t", "ed25519", "-C", email, "-f", key_path, "-N", ""])
+            utils.run_cmd(["eval", "$(ssh-agent -s)"])
+            utils.run_cmd(["ssh-add", key_path])
         with open(f"{key_path}.pub") as f:
             print("Public key:")
             print(f.read())
         print("Now add the above public key to your Git provider.")
 
+
 def corrigir_vscode_sources():
     keyring_path = "/usr/share/keyrings/microsoft.gpg"
     sources_file = "/etc/apt/sources.list.d/vscode.sources"
 
-    subprocess.run(f"curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | sudo tee {keyring_path} > /dev/null", shell=True)
+    # Importar a chave GPG da Microsoft usando run_cmd
+    script = f"""
+set -e
+curl -fsSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor | tee {keyring_path} > /dev/null
+"""
+    utils.run_cmd(
+        ["bash"],
+        sudo=True,
+        password=PASSWORD,
+        input=script,
+        check=True
+    )
+
+    # Remover arquivo antigo (se existir)
     if os.path.exists(sources_file):
         os.remove(sources_file)
 
+    # Criar novo arquivo .sources
     content = f"""Types: deb
-    URIs: https://packages.microsoft.com/repos/code/
-    Suites: stable
-    Components: main
-    Signed-By: {keyring_path}
-    """
+URIs: https://packages.microsoft.com/repos/code/
+Suites: stable
+Components: main
+Signed-By: {keyring_path}
+"""
     with open(sources_file, "w") as f:
         f.write(content)
-    subprocess.run(["sudo", "apt", "update"])
+
+    # Atualizar os pacotes
+    utils.run_cmd(["apt", "update"], sudo=True, password=PASSWORD, check=True)
+
 
 def setup_tlp():
     if not detect_battery():
@@ -131,18 +160,18 @@ def setup_tlp():
 
     print("\n\033[34m🔧 Installing TLP and dependencies...\033[0m")
     if DISTRO == "arch":
-        subprocess.run(["yay", "-S", "--noconfirm", "tlp", "tlp-rdw"])
+        utils.run_cmd(["yay", "-S", "--noconfirm", "tlp", "tlp-rdw"], sudo=True, password=PASSWORD)
     elif DISTRO == "debian":
         remove_trava()
-        subprocess.run(["sudo", "apt", "install", "-y", "tlp", "tlp-rdw"])
+        utils.run_cmd(["apt", "install", "-y", "tlp", "tlp-rdw"], sudo=True, password=PASSWORD)
     elif DISTRO == "fedora":
-        subprocess.run(["sudo", "dnf", "install", "-y", "tlp", "tlp-rdw"])
+        utils.run_cmd(["dnf", "install", "-y", "tlp", "tlp-rdw"], sudo=True, password=PASSWORD)
     else:
         print("\033[31m❌  Unsupported distribution for installing TLP.\033[0m")
         return
 
-    subprocess.run(["sudo", "systemctl", "enable", "--now", "tlp.service"])
-    subprocess.run(["sudo", "tlp-stat", "-s"])
+    utils.run_cmd(["systemctl", "enable", "--now", "tlp.service"], sudo=True, password=PASSWORD)
+    utils.run_cmd(["tlp-stat", "-s"], sudo=True, password=PASSWORD)
 
 
 def setup_aliases_and_tools():
@@ -170,15 +199,8 @@ def setup_aliases_and_tools():
 
 
 def setup_bt_service():
-    # Lê o ID da distro do arquivo /etc/os-release
-    distro_id = None
-    with open("/etc/os-release", "r") as f:
-        for line in f:
-            if line.startswith("ID="):
-                distro_id = line.strip().split("=")[1].replace('"', '')
-                break
 
-    if distro_id in ("debian", "pop", "pop_os", "pop-os"):
+    if SO == "debian":
         service_content = """[Unit]
         Description=Bloquear Bluetooth no boot
         After=bluetooth.service
@@ -192,16 +214,18 @@ def setup_bt_service():
         WantedBy=multi-user.target
         """
         # Escreve o arquivo do serviço via sudo tee
-        proc = subprocess.run(
-            ["sudo", "tee", "/etc/systemd/system/rfkill-bluetooth.service"],
-            input=service_content.encode(),
-            stdout=subprocess.DEVNULL,
-            check=True
+        utils.run_cmd(
+            ["tee", "/etc/systemd/system/rfkill-bluetooth.service"],
+            sudo=True,
+            check=True,
+            password=PASSWORD,
+            input=service_content  # string, não precisa encode()
         )
 
+
         # Recarrega o daemon e habilita o serviço
-        utils.run_cmd(["sudo", "systemctl", "daemon-reexec"], check=True)
-        subprocess.run(["sudo", "systemctl", "enable", "rfkill-bluetooth.service"], check=True)
+        utils.run_cmd(["systemctl", "daemon-reexec"], sudo=True, password=PASSWORD)
+        utils.run_cmd(["systemctl", "enable", "rfkill-bluetooth.service"], sudo=True, password=PASSWORD)
 
 
 
@@ -214,11 +238,11 @@ def set_configs_fastfetch():
         print("❌ File 'resources/fast.zip' not found!")
         return 1
 
-    # Descompacta fast.zip na pasta atual
-    unzip_proc = subprocess.run(["unzip", "-o", str(fastzip)])
-    if unzip_proc.returncode != 0:
+    result = utils.run_cmd(["unzip", "-o", str(fastzip)], check=False)
+    if result.returncode != 0:
         print("❌ Failed to unzip fast.zip")
         return 1
+
 
     # Remove configuração antiga
     if fastfetch_dir.exists():
@@ -268,7 +292,6 @@ def configs():
         utils.run_cmd(cmd)
 
 
-
 def set_profile_picture_current_user():
     if DISTRO != "debian":
         return
@@ -283,21 +306,16 @@ def set_profile_picture_current_user():
     if not svg_path.is_file():
         return 1
 
-    # Converter SVG para PNG (precisa ter imagem convertida)
+    # Converter SVG para PNG
     result = utils.run_cmd(["convert", str(svg_path), str(png_path)])
     if result.returncode != 0:
         return 1
 
-    try:
-        utils.run_cmd(["cp", str(png_path), str(icon_path)], sudo=True)
-    except subprocess.CalledProcessError:
-        return 1
-
+        utils.run_cmd(["cp", str(png_path), str(icon_path)], sudo=True, password=PASSWORD)
     conf_content = f"[User]\nIcon={icon_path}\n"
-    utils.run_cmd(["bash", "-c", f"echo '{conf_content}' > '{user_conf_path}'"], sudo=True)
-    utils.run_cmd(["chmod", "644", str(icon_path)], sudo=True)
-    utils.run_cmd(["chown", "root:root", str(icon_path)], sudo=True)
-
+    utils.run_cmd(["bash", "-c", f"echo '{conf_content}' > '{user_conf_path}'"], sudo=True, password=PASSWORD)
+    utils.run_cmd(["chmod", "644", str(icon_path)], sudo=True, password=PASSWORD)
+    utils.run_cmd(["chown", "root:root", str(icon_path)], sudo=True, password=PASSWORD)
 
 
 def configs_keyboard():
@@ -342,3 +360,4 @@ def configs_keyboard():
     utils.run_cmd(["gsettings", "set", "org.gnome.desktop.wm.keybindings", "move-to-workspace-right", f"['{RIGHT_SHORTCUT}']"])
     utils.run_cmd(["gsettings", "set", "org.gnome.desktop.wm.keybindings", "close", f"['{CLOSE_SHORTCUT}']"])
     utils.run_cmd(["gsettings", "set", "org.gnome.desktop.wm.keybindings", "minimize", f"['{MINIMIZE_SHORTCUT}']"])
+
