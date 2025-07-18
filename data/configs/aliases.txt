@@ -1,0 +1,9 @@
+# Aliases úteis
+alias ll='ls -lah'
+alias gs='git status'
+alias gp='git push'
+alias gl='git log --oneline --graph'
+alias bat='upower -i /org/freedesktop/UPower/devices/battery_BAT1'
+alias poweroff='systemctl -i poweroff'
+alias reboot='systemctl -i reboot'
+alias f='fastfetch'

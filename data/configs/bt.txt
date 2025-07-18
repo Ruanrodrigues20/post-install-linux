@@ -1,0 +1,11 @@
+[Unit]
+Description=Bloquear Bluetooth no boot
+After=bluetooth.service
+ConditionPathExists=/usr/sbin/rfkill
+
+[Service]
+Type=oneshot
+ExecStart=/usr/sbin/rfkill block bluetooth
+
+[Install]
+WantedBy=multi-user.target

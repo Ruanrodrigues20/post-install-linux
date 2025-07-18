@@ -42,8 +42,8 @@ def _get_so():
     """
     return this system's shared object extension
     """
-    SOs = ["fedora", "debian", "arch", "ubuntu", "linuxmint", "pop!_os",
-            "cachyOs", "zorin"]
+    SOs = ["fedora", "debian", "arch linux", "ubuntu", "linux mint", "pop!_os",
+            "cachyOs", "zorin os"]
     so = _get_distro().lower()
 
     for s in SOs:
@@ -56,7 +56,15 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.abspath(os.path.join(BASE_DIR, '../../../data'))
 TEMP_DIR = os.path.join(DATA_DIR, 'temp')
 JSON_DIR = os.path.join(DATA_DIR, 'json')
-ZIP_DIR = os.path.join(DATA_DIR, 'zip')
+CONFIGS_DIR = os.path.join(DATA_DIR, 'configs')
 DISTRO = get_distro()
 SO = _get_so()
-PASSWORD = getpass.getpass("Enter your password: ")
+
+_password = None
+
+def get_password():
+    global _password
+    if _password is None:
+        _password = getpass.getpass("Digite sua senha: ")
+    return _password
+

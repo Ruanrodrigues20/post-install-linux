@@ -2,7 +2,7 @@ import subprocess
 import sys
 import os
 import json
-from src.post_install_linux.backend.env import JSON_DIR, DISTRO
+from src.post_install_linux.backend.env import JSON_DIR, DISTRO, CONFIGS_DIR
 
 
 def run_cmd(cmd, cwd=None, sudo=False, check=False, capture_output=False):
@@ -73,6 +73,12 @@ def get_data(distro: str, categoria: str) -> list[str]:
 
     return data.get(categoria, [])
 
+
+def get_configs(config:str):
+    path = os.path.join(CONFIGS_DIR, f"{config}.txt")
+    with open(path, "r") as arquivo:
+        file = arquivo.read()
+    return file
 
 
 
