@@ -38,9 +38,7 @@
     ],
      "snaps":[
         "notion-snap-reborn",
-        "notion-calendar-snap",
-        "snap-store",
-        "intellij-idea-ultimate"
+        "notion-calendar-snap"
     ]
 
 }
