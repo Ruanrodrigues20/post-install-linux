@@ -241,11 +241,10 @@ setup_tlp() {
 }
 
 download_for_drive() {
-    local files=($(get_common_object "drive"))
+    local files=($(get_object "common" "drive"))
     
     mkdir -p tmp
     cd tmp || { echo "❌ Failed to enter tmp directory"; return 1; }
-
     for obj in "${files[@]}"; do
         url=$(echo "$obj" | jq -r '.url')
         name=$(echo "$obj" | jq -r '.name')
@@ -265,7 +264,7 @@ download_for_drive() {
 set_configs_fastfetch() {
     mkdir -p tmp
 
-    local link_config_fastfetch=$(get_common "drive" | head -n 1)
+    local link_config_fastfetch=$(get_object "$DISTRO" "drive" | head -n 1)
     
 
     if [ ! -f tmp/fast.zip ]; then

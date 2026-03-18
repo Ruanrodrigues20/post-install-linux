@@ -246,24 +246,40 @@ get_common() {
     jq -r --arg key "$key" '.[$key][]?' "$json_path"
 }
 
-get_common_object() {
-    local key="$1"
-    local json_path="data/common.json"
+get_object() {
+    local distro="$1"
+    local key="$2"
+    local json_path
 
+    # Escolhe o arquivo JSON
+    if [ "$distro" = "arch" ]; then
+        json_path="data/arch.json"
+    elif [ "$distro" = "debian" ]; then
+        json_path="data/debian.json"
+    elif [ "$distro" = "fedora" ]; then
+        json_path="data/fedora.json"
+    else
+        json_path="data/common.json"
+    fi
+
+    # Valida key
     if [ -z "$key" ]; then
-        echo "❌ Uso: get_common_object <chave>" >&2
+        echo "❌ Uso: get_object <chave>" >&2
         return 1
     fi
 
+    # Valida JSON
     if [ ! -f "$json_path" ]; then
         echo "❌ Arquivo não encontrado: $json_path" >&2
         return 1
     fi
 
+    # Garante jq
     if ! command -v jq >/dev/null 2>&1; then
         install_pkg "jq"
     fi
 
+    # Retorna cada objeto em linha compacta
     jq -c --arg key "$key" '.[$key][]?' "$json_path"
 }
 
