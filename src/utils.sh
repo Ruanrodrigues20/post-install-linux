@@ -246,6 +246,26 @@ get_common() {
     jq -r --arg key "$key" '.[$key][]?' "$json_path"
 }
 
+get_common_object() {
+    local key="$1"
+    local json_path="data/common.json"
+
+    if [ -z "$key" ]; then
+        echo "❌ Uso: get_common_object <chave>" >&2
+        return 1
+    fi
+
+    if [ ! -f "$json_path" ]; then
+        echo "❌ Arquivo não encontrado: $json_path" >&2
+        return 1
+    fi
+
+    if ! command -v jq >/dev/null 2>&1; then
+        install_pkg "jq"
+    fi
+
+    jq -c --arg key "$key" '.[$key][]?' "$json_path"
+}
 
 
 get_packages() {

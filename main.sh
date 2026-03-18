@@ -24,9 +24,7 @@ setup(){
         source "$module"
     done
     check_internet_connection
-    detect_distro
-    mkdir -p resources
-    
+    detect_distro 
 }
 
 install_minimal(){
@@ -50,6 +48,7 @@ install_complete(){
     
 
     #Configuração final
+    download_for_drive
     setup_aliases_and_tools
     git_config
     setup_tlp
@@ -78,6 +77,7 @@ install_full(){
     gtk_theme
 
     #Configuração final
+    download_for_drive
     setup_aliases_and_tools
     install_theme_grub
     git_config

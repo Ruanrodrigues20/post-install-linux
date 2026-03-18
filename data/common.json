@@ -51,5 +51,11 @@
         "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FiraCode.zip",
         "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FiraMono.zip",
         "https://github.com/sahibjotsaggu/San-Francisco-Pro-Fonts/archive/refs/heads/master.zip"
+    ],
+    "drive": [
+        {
+            "url": "https://docs.google.com/uc?export=download&id=1HMDL8NdhxPOY3x8RZQVwWJ3vc5Lm9N1u",
+            "name": "fast.zip"
+        }
     ]
 }

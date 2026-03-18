@@ -16,10 +16,10 @@ setup_yay() {
 
         sudo pacman -S --noconfirm --needed base-devel git
 
-        mkdir -p resources
+        mkdir -p tmp
 
         (
-            cd resources
+            cd tmp
             git clone https://aur.archlinux.org/yay.git
             cd yay && makepkg -si --noconfirm
             yay -Sy --aur --devel --timeupdate
@@ -240,15 +240,41 @@ setup_tlp() {
 
 }
 
+download_for_drive() {
+    local files=($(get_common_object "drive"))
+    
+    mkdir -p tmp
+    cd tmp || { echo "❌ Failed to enter tmp directory"; return 1; }
+
+    for obj in "${files[@]}"; do
+        url=$(echo "$obj" | jq -r '.url')
+        name=$(echo "$obj" | jq -r '.name')
+
+        echo "🔹 Downloading '$name'..."
+        if curl -L "$url" -o "$name"; then
+            echo "✅ Downloaded '$name'"
+        else
+            echo "❌ Failed to download '$name'"
+        fi
+    done
+
+    cd .. || { echo "❌ Failed to return to previous directory"; return 1; }
+}
+
 
 set_configs_fastfetch() {
-    if [ ! -f resources/fast.zip ]; then
-        echo "❌ File 'resources/fast.zip' not found!"
+    mkdir -p tmp
+
+    local link_config_fastfetch=$(get_common "drive" | head -n 1)
+    
+
+    if [ ! -f tmp/fast.zip ]; then
+        echo "❌ File 'tmp/fast.zip' not found!"
         return 1
     fi
 
     (
-        unzip -o resources/fast.zip || { echo "❌ Failed to unzip fast.zip"; exit 1; }
+        unzip -o tmp/fast.zip || { echo "❌ Failed to unzip fast.zip"; exit 1; }
 
         rm -rf ~/.config/fastfetch
 
