@@ -34,7 +34,6 @@ install_minimal(){
     install_dependencies
     install_packages
     install_flatpaks
-    snaps_install
 }
 
 
@@ -48,7 +47,6 @@ install_complete(){
     install_debs
     intellij_install
     install_flatpaks
-    snaps_install
     
 
     #Configuração final
@@ -75,7 +73,6 @@ install_full(){
     install_debs
     intellij_install
     install_flatpaks
-    snaps_install
     
     configs_wallpapers
     gtk_theme

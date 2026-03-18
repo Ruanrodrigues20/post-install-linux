@@ -37,12 +37,6 @@
         "https://github.com/vinceliuice/WhiteSur-wallpapers.git",
         "https://github.com/vinceliuice/WhiteSur-cursors.git"
     ],
-    "snaps": [
-        "notion-snap-reborn",
-        "notion-calendar-snap",
-        "snap-store",
-        "intellij-idea-ultimate"
-    ],
     "alias": [
         "alias ll='ls -lah'",
         "alias gs='git status'",
@@ -55,6 +49,7 @@
         "https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Hack.zip",
         "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/0xProto.zip",
         "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FiraCode.zip",
-        "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FiraMono.zip"
+        "https://github.com/ryanoasis/nerd-fonts/releases/download/v3.4.0/FiraMono.zip",
+        "https://github.com/sahibjotsaggu/San-Francisco-Pro-Fonts/archive/refs/heads/master.zip"
     ]
 }

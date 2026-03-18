@@ -37,21 +37,54 @@ install_packages() {
 }
 
 install_fonts() {
-    echo -e "\e[1;34m===== 🔥 Installing Fonts =====\e[0m"
-    detect_distro
+    echo -e "\e[1;34m===== 🔤 Installing Fonts =====\e[0m"
 
-    local fonts=(get_common "fonts")
-}
+    local font_dir="$HOME/.local/share/fonts"
+    mkdir -p "$font_dir"
 
-snaps_install() {
-    if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "fedora" ]; then
-        echo -e "\e[1;34m===== 🔥 Installing Snaps =====\e[0m"
-        if [[ "$DISTRO" == "fedora" && ! -e /snap ]]; then
-            sudo ln -s /var/lib/snapd/snap /snap
-        fi
-        install snap $(get_common "snaps")
+    # pega fontes (uma por linha)
+    local fonts
+    fonts=$(get_common "fonts")
+
+    if [ -z "$fonts" ]; then
+        echo "ℹ️ Nenhuma fonte definida."
+        return 0
     fi
+
+    while IFS= read -r font_url; do
+        [ -z "$font_url" ] && continue
+
+        local file_name
+        file_name="$(basename "$font_url")"
+
+        local tmp_file="/tmp/$file_name"
+
+        echo "🔹 Baixando: $file_name"
+        wget -q "$font_url" -O "$tmp_file"
+
+        if [[ "$file_name" == *.zip ]]; then
+            # cria pasta com nome do arquivo sem .zip
+            local folder_name="${file_name%.zip}"
+            local extract_dir="$font_dir/$folder_name"
+            mkdir -p "$extract_dir"
+
+            echo "📦 Extraindo $file_name para $extract_dir"
+            unzip -o "$tmp_file" -d "$extract_dir"
+
+            rm -f "$tmp_file"
+        else
+            echo "📁 Movendo $file_name para $font_dir"
+            mv "$tmp_file" "$font_dir/"
+        fi
+
+    done <<< "$fonts"
+
+    echo "🔄 Atualizando cache de fontes..."
+    fc-cache -fv >/dev/null 2>&1
+
+    echo -e "\e[1;32m✔ Fonts instaladas com sucesso.\e[0m"
 }
+
 
 install_flatpaks() {
     echo -e "\e[1;34m===== 🔥 Installing Flatpak Applications =====\e[0m"
