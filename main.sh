@@ -91,7 +91,7 @@ install_full(){
     configs_keyboard
     install_fonts
     set_configs_fastfetch
-    install_oh_my_bash
+    install_theme_shell
 }
 
 # ======================

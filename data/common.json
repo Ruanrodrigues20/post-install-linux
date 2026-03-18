@@ -3,7 +3,8 @@
         "fastfetch",
         "maven",
         "ufw",
-        "vlc"
+        "vlc",
+        "zsh"
     ],
     "dependencies": [
         "bash-completion",

@@ -31,30 +31,26 @@ setup_yay() {
 }
 
 
+install_theme_shell() {
+    echo -e "\e[1;34m===== 🐚 Escolha seu shell =====\e[0m"
+    echo "1) Oh My Bash"
+    echo "2) Oh My Zsh"
+    echo ""
 
-install_theme_grub() {
-    if grub-install --version &>/dev/null; then
-        echo -e "\e[1;34m===== 🔥 Installing Theme Grub =====\e[0m"
+    read -p "Escolha uma opção (1 ou 2): " choice
 
-        sudo mkdir -p /boot/grub/themes
-        
-        (
-            cd /boot/grub/themes || { echo "Failed to enter /boot/grub/themes"; return 1; }
-            
-            if [ ! -d grub2-themes ]; then
-                sudo git clone https://github.com/vinceliuice/grub2-themes.git
-            fi
-            
-            cd grub2-themes || { echo "Failed to enter grub2-themes"; return 1; }
-            
-            sudo ./install.sh -t whitesur -i whitesur
-            if [ $DISTRO == "fedora" ]; then
-                sudo grub2-mkconfig -o /boot/grub2/grub.cfg
-            else
-                sudo update-grub
-            fi
-        )
-    fi
+    case "$choice" in
+        1)
+            install_oh_my_bash
+            ;;
+        2)
+            install_oh_my_zsh
+            ;;
+        *)
+            echo -e "\e[1;31m❌ Opção inválida.\e[0m"
+            return 1
+            ;;
+    esac
 }
 
 
@@ -62,21 +58,52 @@ install_oh_my_bash() {
     echo -e "\e[1;34m===== 🔥 Installing Oh My Bash =====\e[0m"
 
     if [ -d "$HOME/.oh-my-bash" ]; then
-        echo "Oh My Bash is already installed. Skipping..."
+        echo "✔ Oh My Bash já instalado. Pulando..."
         return
     fi
 
-    echo "Cloning Oh My Bash..."
     git clone --depth=1 https://github.com/ohmybash/oh-my-bash.git ~/.oh-my-bash
 
-    echo "Setting up ~/.bashrc with the powerline theme..."
     cp ~/.oh-my-bash/templates/bashrc.osh-template ~/.bashrc
 
-    # Set the powerline theme in .bashrc
+    # Tema
     sed -i 's/^OSH_THEME=.*/OSH_THEME="powerline"/' ~/.bashrc
-    echo -e "\e[1;32mOh My Bash has been installed with the 'powerline' theme. Restart the terminal to apply the changes.\e[0m"
+
+    echo -e "\e[1;32m✔ Oh My Bash instalado com tema powerline.\e[0m"
 }
 
+
+install_oh_my_zsh() {
+    echo -e "\e[1;34m===== 🔥 Installing Oh My Zsh =====\e[0m"
+
+    # garante zsh
+    if ! command -v zsh >/dev/null 2>&1; then
+        echo "🔹 Instalando zsh..."
+        install_pkg "zsh"
+    fi
+
+    if [ -d "$HOME/.oh-my-zsh" ]; then
+        echo "✔ Oh My Zsh já instalado. Pulando..."
+        return
+    fi
+
+    echo "🔹 Instalando Oh My Zsh..."
+
+    # instalação silenciosa (sem travar script)
+    RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+    # define tema
+    sed -i 's/^ZSH_THEME=.*/ZSH_THEME="agnoster"/' ~/.zshrc
+
+    echo -e "\e[1;32m✔ Oh My Zsh instalado com tema agnoster.\e[0m"
+
+    # pergunta se quer trocar shell padrão
+    read -p "Deseja definir zsh como shell padrão? (y/n): " ans
+    if [[ "$ans" =~ ^[Yy]$ ]]; then
+        chsh -s "$(which zsh)"
+        echo "✔ Shell padrão alterado para zsh (logout necessário)"
+    fi
+}
 
 
 

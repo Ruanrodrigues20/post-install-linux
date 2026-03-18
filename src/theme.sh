@@ -18,6 +18,7 @@ gtk_theme() {
         install_theme_cursors
         install_w_themes
         apply_configs_themes
+        install_theme_grub
     )
     cd ..
 
@@ -149,4 +150,30 @@ configs_wallpapers() {
     )
 
     cd "$SCRIPT_DIR" || { echo "Failed to return to script directory"; return 1; }
+}
+
+
+install_theme_grub() {
+    if grub-install --version &>/dev/null; then
+        echo -e "\e[1;34m===== 🔥 Installing Theme Grub =====\e[0m"
+
+        sudo mkdir -p /boot/grub/themes
+        
+        (
+            cd /boot/grub/themes || { echo "Failed to enter /boot/grub/themes"; return 1; }
+            
+            if [ ! -d grub2-themes ]; then
+                sudo git clone https://github.com/vinceliuice/grub2-themes.git
+            fi
+            
+            cd grub2-themes || { echo "Failed to enter grub2-themes"; return 1; }
+            
+            sudo ./install.sh -t whitesur -i whitesur
+            if [ $DISTRO == "fedora" ]; then
+                sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+            else
+                sudo update-grub
+            fi
+        )
+    fi
 }
