@@ -251,7 +251,6 @@ get_object() {
     local key="$2"
     local json_path
 
-    # Escolhe o arquivo JSON
     if [ "$distro" = "arch" ]; then
         json_path="data/arch.json"
     elif [ "$distro" = "debian" ]; then
@@ -262,25 +261,59 @@ get_object() {
         json_path="data/common.json"
     fi
 
-    # Valida key
     if [ -z "$key" ]; then
         echo "❌ Uso: get_object <chave>" >&2
         return 1
     fi
 
-    # Valida JSON
     if [ ! -f "$json_path" ]; then
         echo "❌ Arquivo não encontrado: $json_path" >&2
         return 1
     fi
 
-    # Garante jq
     if ! command -v jq >/dev/null 2>&1; then
         install_pkg "jq"
     fi
 
-    # Retorna cada objeto em linha compacta
     jq -c --arg key "$key" '.[$key][]?' "$json_path"
+}
+
+
+get_url() {
+    local distro="$1"
+    local type="$2"
+    local name="$3"
+    local json_path
+
+    # define arquivo pela distro
+    case "$distro" in
+        arch)   json_path="data/arch.json" ;;
+        debian) json_path="data/debian.json" ;;
+        fedora) json_path="data/fedora.json" ;;
+        common) json_path="data/common.json" ;;
+        *)
+            echo "❌ Distro inválida: $distro" >&2
+            return 1
+            ;;
+    esac
+
+    if [ -z "$type" ] || [ -z "$name" ]; then
+        echo "❌ Uso: get_url <distro> <tipo> <nome>" >&2
+        return 1
+    fi
+
+    if [ ! -f "$json_path" ]; then
+        echo "❌ Arquivo não encontrado: $json_path" >&2
+        return 1
+    fi
+
+    if ! command -v jq >/dev/null 2>&1; then
+        install_pkg "jq"
+    fi
+
+    jq -r --arg type "$type" --arg name "$name" '
+        .[$type][]? | select(.name == $name) | .url
+    ' "$json_path"
 }
 
 
@@ -321,4 +354,36 @@ list_packages() {
     fi
 
     echo "$pacotes"
+}
+
+clone_repo() {
+    local distro="$1"
+    local name="$2"
+    local dest="$3"
+
+    if [ -z "$distro" ] || [ -z "$name" ] || [ -z "$dest" ]; then
+        echo "❌ Uso: clone_repo <distro> <nome> <destino>"
+        return 1
+    fi
+
+    local url
+    url="$(get_url "$distro" repo "$name")"
+
+    if [ -z "$url" ]; then
+        echo "❌ URL não encontrada para '$name'"
+        return 1
+    fi
+
+    if [ -d "$dest" ]; then
+        echo "✔ Repo '$name' já existe em $dest. Pulando..."
+        return 0
+    fi
+
+    echo "🔹 Clonando '$name'..."
+    git clone "$url" "$dest" || {
+        echo "❌ Falha ao clonar '$name'"
+        return 1
+    }
+
+    echo "✔ '$name' clonado com sucesso."
 }

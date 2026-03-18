@@ -10,36 +10,31 @@ gtk_theme() {
     echo -e "\e[1;34m===== 🔥 Installing GTK Theme =====\e[0m"
 
 
-    mkdir -p resources
+    mkdir -p tmp
     clone_repositories
-    (
+    (   
+        cd tmp || { echo "Failed to enter tmp directory"; exit 1; }
         install_gtk_theme
         install_themes_icons
         install_theme_cursors
         install_w_themes
         apply_configs_themes
         install_theme_grub
+        cd ..
     )
-    cd ..
 
 
 }
 
 clone_repositories() {
-    local reps=($(get_common "themes"))
-    echo -e "\e[1;34m===== 🔥 Cloning Repositores =====\e[0m"
-    cd resources
+    echo -e "\e[1;34m===== 🔥 Cloning WhiteSur Themes =====\e[0m"
 
-    
-    for rep in "${reps[@]}"; do
-        local folder=$(basename "$rep" .git)
-        if [ -d "$folder" ]; then
-            echo "📁 Repository '$folder' already cloned. Skipping."
-        else
-            echo "⬇️ Cloning '$rep'..."
-            git clone "$rep"
-        fi
-    done
+    mkdir -p tmp
+
+    clone_repo common whitesur-gtk        tmp/WhiteSur-gtk-theme
+    clone_repo common whitesur-icons      tmp/WhiteSur-icon-theme
+    clone_repo common whitesur-wallpapers tmp/WhiteSur-wallpapers
+    clone_repo common whitesur-cursors    tmp/WhiteSur-cursors
 }
 
 
@@ -128,10 +123,10 @@ configs_wallpapers() {
     local SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
     local WALLPAPER_DIR="$HOME/.local/share/backgrounds"
 
-    mkdir -p resources
+    mkdir -p tmp
 
     (
-        cd resources || { echo "Failed to enter resources directory"; return 1; }
+        cd tmp || { echo "Failed to enter tmp directory"; return 1; }
 
         if [ ! -d wallpapers ]; then
             git clone https://github.com/Ruanrodrigues20/wallpapers.git

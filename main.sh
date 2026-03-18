@@ -43,7 +43,7 @@ install_complete(){
     install_firefox_deb
     downloads_debs
     install_debs
-    intellij_install
+    jetbrain_install
     install_flatpaks
     
 
@@ -70,7 +70,7 @@ install_full(){
     install_firefox_deb
     downloads_debs
     install_debs
-    intellij_install
+    jetbrain_install
     install_flatpaks
     
     configs_wallpapers

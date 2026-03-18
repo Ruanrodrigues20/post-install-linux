@@ -24,5 +24,11 @@
         "gnome-shell-extension-compiz-windows-effect-git",
         "gnome-shell-extension-dash-to-dock",
         "gnome-shell-extension-desktop-cube-git"
+    ],
+    "repo": [
+        {
+            "url": "https://aur.archlinux.org/yay.git",
+            "name": "yay"
+        }
     ]
 }

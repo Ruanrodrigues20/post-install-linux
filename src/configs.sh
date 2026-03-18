@@ -19,13 +19,14 @@ setup_yay() {
         mkdir -p tmp
 
         (
-            cd tmp
-            git clone https://aur.archlinux.org/yay.git
+            clone_repo arch yay yay
+            cd tmp/yay || { echo "❌ Failed to enter yay directory"; exit 1; }
             cd yay && makepkg -si --noconfirm
             yay -Sy --aur --devel --timeupdate
             rm -rf ~/.cache/yay/completion.cache
             yay -Syu
-            cd .. && rm -rf yay
+            rm -rf yay
+            cd ..
         )
     fi
 }
@@ -62,7 +63,7 @@ install_oh_my_bash() {
         return
     fi
 
-    git clone --depth=1 https://github.com/ohmybash/oh-my-bash.git ~/.oh-my-bash
+    clone_repo common ohmyzsh "$HOME/.oh-my-zsh"
 
     cp ~/.oh-my-bash/templates/bashrc.osh-template ~/.bashrc
 
@@ -71,7 +72,6 @@ install_oh_my_bash() {
 
     echo -e "\e[1;32m✔ Oh My Bash instalado com tema powerline.\e[0m"
 }
-
 
 install_oh_my_zsh() {
     echo -e "\e[1;34m===== 🔥 Installing Oh My Zsh =====\e[0m"
@@ -89,15 +89,28 @@ install_oh_my_zsh() {
 
     echo "🔹 Instalando Oh My Zsh..."
 
-    # instalação silenciosa (sem travar script)
-    RUNZSH=no CHSH=no sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    (
+        repo_url="$(get_url common repo ohmyzsh)"
 
-    # define tema
-    sed -i 's/^ZSH_THEME=.*/ZSH_THEME="agnoster"/' ~/.zshrc
+        if [ -z "$repo_url" ]; then
+            echo "❌ URL não encontrada"
+            exit 1
+        fi
+
+        clone_repo common ohmyzsh "$HOME/.oh-my-zsh"
+
+        cp "$HOME/.oh-my-zsh/templates/zshrc.zsh-template" "$HOME/.zshrc"
+
+        sed -i 's/^ZSH_THEME=.*/ZSH_THEME="agnoster"/' "$HOME/.zshrc"
+    )
+
+    if [ $? -ne 0 ]; then
+        echo "❌ Falha na instalação do Oh My Zsh"
+        return 1
+    fi
 
     echo -e "\e[1;32m✔ Oh My Zsh instalado com tema agnoster.\e[0m"
 
-    # pergunta se quer trocar shell padrão
     read -p "Deseja definir zsh como shell padrão? (y/n): " ans
     if [[ "$ans" =~ ^[Yy]$ ]]; then
         chsh -s "$(which zsh)"
@@ -264,28 +277,34 @@ download_for_drive() {
 set_configs_fastfetch() {
     mkdir -p tmp
 
-    local link_config_fastfetch=$(get_object "$DISTRO" "drive" | head -n 1)
-    
+    local link_config_fastfetch=$(get_url common drive "fast.zip")
 
+    if [ -z "$link_config_fastfetch" ]; then
+        echo "❌ No fastfetch config link found for $DISTRO"
+        return 1
+    fi
+
+    curl -L "$link_config_fastfetch" -o tmp/fast.zip || {
+        echo "❌ Failed to download fastfetch config"
+        return 1
+    }
+
+    echo "🔹 Downloading fastfetch config '$name'..."
+    
+    
     if [ ! -f tmp/fast.zip ]; then
         echo "❌ File 'tmp/fast.zip' not found!"
         return 1
     fi
 
     (
-        unzip -o tmp/fast.zip || { echo "❌ Failed to unzip fast.zip"; exit 1; }
+        cd tmp || { echo "❌ Failed to enter parent directory"; exit 1; }
+        unzip -o fast.zip || { echo "❌ Failed to unzip fast.zip"; exit 1; }
 
         rm -rf ~/.config/fastfetch
-
-        if [ -d .config/fastfetch ]; then
-            mv .config/fastfetch ~/.config/
-            echo "✅ fastfetch config installed."
-        else
-            echo "❌ fastfetch config not found after unzip."
-            exit 1
-        fi
-
-        rm -rf .config
+        mv fastfetch ~/.config/
+        echo "✅ fastfetch config installed."
+        cd .. || { echo "❌ Failed to return to previous directory"; exit 1; }
     )
 }
 
@@ -465,4 +484,3 @@ configs_keyboard(){
     gsettings set org.gnome.desktop.wm.keybindings minimize "['$MINIMIZE_SHORTCUT']"
 
 }
-

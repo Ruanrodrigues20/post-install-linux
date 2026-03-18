@@ -98,11 +98,11 @@ downloads_debs() {
         echo -e "\e[1;34m===== 📥 Downloading Extra Software =====\e[0m"
         echo ""
 
-        mkdir -p resources
+        mkdir -p tmp
 
         (
             local downloads_debs=($(get_packages "debian" "downloads_debs"))            
-            cd resources || exit 1
+            cd tmp || exit 1
 
             for link in "${downloads_debs[@]}"; do
                 echo "🔹 Downloading: $link"
@@ -118,7 +118,7 @@ install_debs(){
         echo ""
 
         (
-            cd resources || exit 1
+            cd tmp || exit 1
             local programs=(./*.deb)
 
             for p in "${programs[@]}"; do
@@ -130,19 +130,18 @@ install_debs(){
     fi
 }
 
-intellij_install(){
-    if [ "$DISTRO" = "debian" ]; then
-        mkdir -p resources
+jetbrain_install() {
+    if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "fedora" ]; then
+        mkdir -p tmp
         echo -e "\e[1;34m===== 🔥 Installing IntelliJ =====\e[0m"
 
         (
-            cd resources || return 1
-            git clone https://github.com/Ruanrodrigues20/intelliJ-install || {
-                echo "❌ Failed to clone intelliJ-install repository."
-                return 1
-            }
-            cd intelliJ-install || return 1
-            bash install.sh
+            clone_repo common ides-jetbrain tmp/ides-jetbrain
+            cd tmp/ides-jetbrain || return 1
+            bash run.sh
+            cd ..
+            rm -rf ides-jetbrain
+            cd ..
         )
     fi
 }
@@ -228,3 +227,7 @@ install_rpms(){
         install pkg $(get_packages "$DISTRO" "rpms")
     fi
 }
+
+
+DISTRO="debian"
+jetbrain_install
