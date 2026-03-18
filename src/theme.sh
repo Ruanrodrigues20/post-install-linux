@@ -25,7 +25,7 @@ gtk_theme() {
 }
 
 clone_repositories() {
-    local reps=($(get_data common themes))
+    local reps=($(get_common "themes"))
     echo -e "\e[1;34m===== 🔥 Cloning Repositores =====\e[0m"
     cd resources
 

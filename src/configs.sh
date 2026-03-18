@@ -1,6 +1,6 @@
 #!/bin/bash
 
-
+source src/utils.sh
 
 
 ###########################################################################################
@@ -239,27 +239,22 @@ set_configs_fastfetch() {
 
 
 setup_aliases_and_tools(){
-    echo -e "\e[1;34m===== 🔥 Configuration of the Aliases =====\e[0m"
-    echo ""
+    echo -e "\e[1;34m===== ⚙️ Configurando aliases =====\e[0m"
 
-    # Aliases
-    cat <<EOF >> ~/.bash_aliases
+    local alias_file="$HOME/.bash_aliases"
+    touch "$alias_file"
 
-# Aliases úteis
-alias ll='ls -lah'
-alias gs='git status'
-alias gp='git push'
-alias gl='git log --oneline --graph'
-alias bat='upower -i /org/freedesktop/UPower/devices/battery_BAT1'
-EOF
+    {
+        echo ""
+        echo "# Aliases úteis"
+        
+        while IFS= read -r alias_line; do
+            grep -qxF "$alias_line" "$alias_file" || echo "$alias_line"
+        done < <(get_common "alias")
 
-    echo "Aliases adicionados a ~/.bash_aliases"
+    } >> "$alias_file"
 
-    # Garante que o arquivo ~/.bash_aliases será carregado no .bashrc
-    if ! grep -q "source ~/.bash_aliases" ~/.bashrc; then
-        echo "source ~/.bash_aliases" >> ~/.bashrc
-        echo "Linha 'source ~/.bash_aliases' adicionada ao ~/.bashrc"
-    fi
+    echo -e "\e[1;32m✔ Aliases configurados com sucesso.\e[0m"
 }
 
 

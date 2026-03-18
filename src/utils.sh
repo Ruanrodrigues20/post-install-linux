@@ -224,15 +224,65 @@ _install_snaps() {
   done
 }
 
+get_common() {
+    local key="$1"
+    local json_path="data/common.json"
 
+    if [ -z "$key" ]; then
+        echo "❌ Uso: get_common <chave>" >&2
+        return 1
+    fi
 
-get_data() {
-  local distro=$1
-  local categoria=$2
-  local dados=()
-  read -ra dados <<< "$(python3 src/list_packages.py "$distro" "$categoria")"
-  printf '%s\n' "${dados[@]}"
+    if [ ! -f "$json_path" ]; then
+        echo "❌ Arquivo não encontrado: $json_path" >&2
+        return 1
+    fi
+
+    # garante jq
+    if ! command -v jq >/dev/null 2>&1; then
+        install_pkg "jq"
+    fi
+
+    jq -r --arg key "$key" '.[$key][]?' "$json_path"
 }
 
 
 
+get_packages() {
+  local distro="$1"
+  local categoria="$2"
+  local dados=()
+
+  read -ra dados <<< "$(list_packages "$distro" "$categoria")"
+  printf '%s\n' "${dados[@]}"
+}
+
+
+list_packages() {
+    if [ "$#" -lt 2 ]; then
+        echo "Uso: list_packages <distro> <categoria>" >&2
+        return 1
+    fi
+
+    local distro="$1"
+    local categoria="$2"
+    local json_path="data/${distro}.json"
+
+    if [ ! -f "$json_path" ]; then
+        return 1
+    fi
+
+    # Precisa do jq instalado
+    if ! command -v jq >/dev/null 2>&1; then
+        install_pkg "jq"
+    fi
+
+    local pacotes
+    pacotes=$(jq -r --arg cat "$categoria" '.[$cat] // empty | join(" ")' "$json_path")
+
+    if [ -z "$pacotes" ]; then
+        return 1
+    fi
+
+    echo "$pacotes"
+}

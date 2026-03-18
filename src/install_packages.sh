@@ -9,7 +9,7 @@ install_dependencies(){
     echo -e "\e[1;34m===== 🔥 Installing Dependencies =====\e[0m"
 
     if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "arch" ] || [ "$DISTRO" = "fedora" ]; then
-        install pkg $(get_data common dependencies)
+        install pkg $(get_common "dependencies")
     else
         echo "$DISTRO"
         return 1
@@ -20,10 +20,10 @@ install_packages() {
     echo -e "\e[1;34m===== 🔥 Installing Packages =====\e[0m"
 
     if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "arch" ] || [ "$DISTRO" = "fedora" ]; then        
-        install pkg $(get_data common common)
-        install pkg $(get_data "$DISTRO" apps)
+        install pkg $(get_common "common")
+        install pkg $(get_packages "$DISTRO" "apps")
         if is_gnome; then
-            install pkg $(get_data "$DISTRO" "gnome")
+            install pkg $(get_packages "$DISTRO" "gnome")
         fi
 
         if [ "$DISTRO" = "fedora" ]; then
@@ -38,30 +38,9 @@ install_packages() {
 
 install_fonts() {
     echo -e "\e[1;34m===== 🔥 Installing Fonts =====\e[0m"
-    if [ "$DISTRO" = "debian" ] || [ "$DISTRO" = "arch" ] || [ "$DISTRO" = "fedora" ]; then
-        install pkg $(get_data "$DISTRO" "fonts")
+    detect_distro
 
-        local font_dir="$HOME/.local/share/fonts"
-        local tmp_dir="$(mktemp -d)"
-
-        mkdir -p "$font_dir"
-
-        # Instalar JetBrainsMono Nerd Font
-        local jb_url="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip"
-        curl -fsSL "$jb_url" -o "$tmp_dir/JetBrainsMono.zip"
-        unzip -q "$tmp_dir/JetBrainsMono.zip" -d "$font_dir"
-
-        # Instalar Hack Nerd Font
-        local hack_url="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Hack.zip"
-        curl -fsSL "$hack_url" -o "$tmp_dir/Hack.zip"
-        unzip -q "$tmp_dir/Hack.zip" -d "$font_dir"
-
-        fc-cache -f "$font_dir"
-        rm -rf "$tmp_dir"
-    else
-        echo "Invalid Distro: $DISTRO"
-        return 1
-    fi
+    local fonts=(get_common "fonts")
 }
 
 snaps_install() {
@@ -70,7 +49,7 @@ snaps_install() {
         if [[ "$DISTRO" == "fedora" && ! -e /snap ]]; then
             sudo ln -s /var/lib/snapd/snap /snap
         fi
-        install snap $(get_data common snaps)
+        install snap $(get_common "snaps")
     fi
 }
 
@@ -78,7 +57,7 @@ install_flatpaks() {
     echo -e "\e[1;34m===== 🔥 Installing Flatpak Applications =====\e[0m"
     echo ""
     flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
-    install flatpak $(get_data common flatpaks)
+    install flatpak $(get_common "flatpaks")
 }
 
 downloads_debs() {
@@ -89,7 +68,7 @@ downloads_debs() {
         mkdir -p resources
 
         (
-            local downloads_debs=($(get_data debian downloads_debs))            
+            local downloads_debs=($(get_packages "debian" "downloads_debs"))            
             cd resources || exit 1
 
             for link in "${downloads_debs[@]}"; do
@@ -213,6 +192,6 @@ EOF
 install_rpms(){
     if [ "$DISTRO" = "fedora" ]; then
         echo -e "\e[1;34m===== 🔥 Installing rpms =====\e[0m"
-        install pkg $(get_data "$DISTRO" "rpms")
+        install pkg $(get_packages "$DISTRO" "rpms")
     fi
 }
