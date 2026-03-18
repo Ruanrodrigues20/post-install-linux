@@ -261,6 +261,8 @@ download_for_drive() {
     for obj in "${files[@]}"; do
         url=$(echo "$obj" | jq -r '.url')
         name=$(echo "$obj" | jq -r '.name')
+        echo $url
+        echo $name
 
         echo "🔹 Downloading '$name'..."
         if curl -L "$url" -o "$name"; then

@@ -46,7 +46,6 @@ install_complete(){
     install_flatpaks
     
 
-    #Configuração final
     download_for_drive
     setup_aliases_and_tools
     git_config
@@ -59,7 +58,6 @@ install_complete(){
 }
 
 install_full(){
-    # Etapas principais
     setup_yay
     install_dependencies
     install_packages
@@ -72,7 +70,6 @@ install_full(){
     configs_wallpapers
     gtk_theme
 
-    #Configuração final
     download_for_drive
     setup_aliases_and_tools
     install_theme_grub
@@ -140,4 +137,7 @@ main() {
 }
 
 
-main "$@"
+
+setup
+download_for_drive
+install_theme_sound

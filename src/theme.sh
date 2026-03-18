@@ -19,7 +19,7 @@ gtk_theme() {
         install_theme_cursors
         install_w_themes
         apply_configs_themes
-        install_theme_grub
+        install_theme_sound
         cd ..
     )
 
@@ -113,6 +113,9 @@ apply_configs_themes() {
     
     gsettings set org.gnome.desktop.background picture-uri-dark "file://$HOME/.local/share/backgrounds/sequoia.jpeg" \
         && echo "✅ Dark background applied." || echo "❌ Failed to apply dark background."
+
+    gsettings set org.gnome.desktop.sound theme-name "MacOs-Sounds"
+        && echo "✅ Sound theme applied." || echo "❌ Failed to apply sound theme."
 }
 
 
@@ -171,4 +174,17 @@ install_theme_grub() {
             fi
         )
     fi
+}
+
+install_theme_sound(){
+    echo -e "\e[1;34m===== 🔥 Installing MacOS Sounds =====\e[0m"
+    (
+        cd tmp
+        unzip MacOs-Sounds.zip -d MacOs-Sounds
+        mv MacOs-Sounds/MacOs-Sounds ~/.local/share/sounds/MacOs-Sounds
+        cd ..
+        rm -rf tmp/MacOs-Sounds.zip
+        rm -rf tmp/MacOs-Sounds
+    )
+    
 }
