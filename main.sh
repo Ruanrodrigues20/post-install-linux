@@ -39,7 +39,6 @@ install_complete(){
     setup_yay
     install_dependencies
     install_packages
-    install_fonts
     install_firefox_deb
     downloads_debs
     install_debs
@@ -64,7 +63,6 @@ install_full(){
     setup_yay
     install_dependencies
     install_packages
-    install_fonts
     install_firefox_deb
     downloads_debs
     install_debs
