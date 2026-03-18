@@ -227,7 +227,3 @@ install_rpms(){
         install pkg $(get_packages "$DISTRO" "rpms")
     fi
 }
-
-
-DISTRO="debian"
-jetbrain_install
