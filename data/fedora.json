@@ -1,9 +1,9 @@
 {
-    "apps":[
+    "apps": [
         "python3-pip",
         "python3-virtualenv",
         "python3-poetry",
-        "java-21-openjdk",
+        "java-25-openjdk",
         "snapd",
         "maven",
         "libreoffice",
@@ -15,7 +15,7 @@
         "gstreamer1-libav",
         "transmission"
     ],
-    "gnome":[
+    "gnome": [
         "gnome-software",
         "gnome-tweaks",
         "gnome-terminal",
@@ -23,14 +23,9 @@
         "gnome-shell-extension-appindicator",
         "gnome-shell-extension-blur-my-shell",
         "gnome-shell-extension-dash-to-dock",
-        "gnome-shell-extension-user-theme",
-        "gnome-shell-extension-caffeine"
+        "gnome-shell-extension-user-theme"
     ],
-    "fonts":[
-        "fira-code-fonts",
-        "jetbrains-mono-fonts"
-    ],
-    "rpms":[
+    "rpms": [
         "https://vscode.download.prss.microsoft.com/dbazure/download/stable/18e3a1ec544e6907be1e944a94c496e302073435/code-1.101.1-1750254783.el8.x86_64.rpm",
         "https://downloads.sourceforge.net/project/mscorefonts2/rpms/msttcore-fonts-installer-2.6-1.noarch.rpm"
     ]

@@ -1,6 +1,6 @@
 {
     "apps": [
-        "jdk21-openjdk",
+        "jdk25-openjdk",
         "python-pip",
         "visual-studio-code-bin",
         "libreoffice-fresh-pt-br",
@@ -11,14 +11,8 @@
         "gufw",
         "flatpak",
         "imagemagick",
-        "obs-studio"
-    ],
-    "fonts": [
-        "ttf-ms-fonts",
-        "ttf-jetbrains-mono-nerd",
-        "ttf-fira-code",
-        "fonts-powerline",
-        "ttf-nerd-fonts-symbols"
+        "obs-studio",
+        "ttf-ms-fonts"
     ],
     "gnome": [
         "gnome-software",
